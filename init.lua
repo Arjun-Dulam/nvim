@@ -128,6 +128,37 @@ end, { desc = "Copy file directory" })
 -- Quick config editing
 vim.keymap.set("n", "<leader>rc", ":e ~/.config/nvim/init.lua<CR>", { desc = "Edit config" })
 
+-- Copy full / relative file path
+vim.keymap.set("n", "<leader>pf", function()
+  local path = vim.fn.expand("%:p")
+  vim.fn.setreg("+", path)
+  print("full path:", path)
+end, { desc = "Copy full file path" })
+
+vim.keymap.set("n", "<leader>pr", function()
+  local path = vim.fn.expand("%")
+  vim.fn.setreg("+", path)
+  print("relative path:", path)
+end, { desc = "Copy relative file path" })
+
+-- Rename current file
+vim.keymap.set("n", "<leader>rr", function()
+  local old = vim.fn.expand("%")
+  local new = vim.fn.input("New file name: ", old)
+  if new ~= "" and new ~= old then
+    vim.cmd("saveas " .. new)
+    vim.fn.delete(old)
+    print("Renamed to: " .. new)
+  end
+end, { desc = "Rename current file" })
+
+-- Tabs
+vim.keymap.set("n", "<leader>tn", ":tabnew<CR>",   { desc = "New tab" })
+vim.keymap.set("n", "<leader>tx", ":tabclose<CR>", { desc = "Close tab" })
+
+-- Autocmd group
+local augroup = vim.api.nvim_create_augroup("UserConfig", { clear = true })
+
 -- Highlight yanked text
 vim.api.nvim_create_autocmd("TextYankPost", {
   group = augroup,
@@ -151,3 +182,142 @@ vim.api.nvim_create_autocmd("BufReadPost", {
     end
   end,
 })
+
+-- Auto-resize splits when Neovide window is resized
+vim.api.nvim_create_autocmd("VimResized", {
+  group = augroup,
+  callback = function() vim.cmd("tabdo wincmd =") end,
+})
+
+-- ============================================================================
+-- STATUSLINE
+-- ============================================================================
+
+local cached_branch = ""
+local last_check = 0
+local function git_branch()
+  local now = vim.loop.now()
+  if now - last_check > 5000 then
+    cached_branch = vim.fn.system("git branch --show-current 2>/dev/null | tr -d '\n'")
+    last_check = now
+  end
+  if cached_branch ~= "" then
+    return " \u{e725} " .. cached_branch .. " "
+  end
+  return ""
+end
+
+local function file_type()
+  local ft = vim.bo.filetype
+  local icons = {
+    lua = "\u{e620} ", python = "\u{e73c} ", javascript = "\u{e74e} ",
+    typescript = "\u{e628} ", javascriptreact = "\u{e7ba} ", typescriptreact = "\u{e7ba} ",
+    html = "\u{e736} ", css = "\u{e749} ", scss = "\u{e749} ", json = "\u{e60b} ",
+    markdown = "\u{e73e} ", vim = "\u{e62b} ", sh = "\u{f489} ", bash = "\u{f489} ",
+    zsh = "\u{f489} ", rust = "\u{e7a8} ", go = "\u{e724} ", c = "\u{e61e} ",
+    cpp = "\u{e61d} ", java = "\u{e738} ", php = "\u{e73d} ", ruby = "\u{e739} ",
+    swift = "\u{e755} ", kotlin = "\u{e634} ", dart = "\u{e798} ", sql = "\u{e706} ",
+    yaml = "\u{f481} ", toml = "\u{e615} ", dockerfile = "\u{f308} ",
+  }
+  if ft == "" then return " \u{f15b} " end
+  return (icons[ft] or " \u{f15b} " .. ft)
+end
+
+local function file_size()
+  local size = vim.fn.getfsize(vim.fn.expand("%"))
+  if size < 0 then return "" end
+  if size < 1024 then return " \u{f016} " .. size .. "B " end
+  if size < 1024 * 1024 then return " \u{f016} " .. string.format("%.1fK", size / 1024) .. " " end
+  return " \u{f016} " .. string.format("%.1fM", size / 1024 / 1024) .. " "
+end
+
+local function mode_icon()
+  local mode = vim.fn.mode()
+  local modes = {
+    n = " \u{f040} NORMAL", i = " \u{f303} INSERT", v = " \u{f06e} VISUAL",
+    V = " \u{f06e} V-LINE", ["\22"] = " \u{f06e} V-BLOCK", c = " \u{f120} COMMAND",
+    R = " \u{f044} REPLACE", r = " \u{f044} REPLACE", t = " \u{f120} TERMINAL",
+  }
+  return modes[mode] or " \u{f059} " .. mode:upper()
+end
+
+_G.mode_icon  = mode_icon
+_G.git_branch = git_branch
+_G.file_type  = file_type
+_G.file_size  = file_size
+
+vim.api.nvim_set_hl(0, "StatusLineBold", { bold = true })
+
+vim.api.nvim_create_autocmd({ "WinEnter", "BufEnter" }, {
+  group = augroup,
+  callback = function()
+    vim.opt_local.statusline = table.concat {
+      "  ", "%#StatusLineBold#", "%{v:lua.mode_icon()}", "%#StatusLine#",
+      " \u{e0b1} %f %h%m%r", "%{v:lua.git_branch()}", "\u{e0b1} ",
+      "%{v:lua.file_type()}", "\u{e0b1} ", "%{v:lua.file_size()}",
+      "%=", " \u{f017} %l:%c  %P ",
+    }
+  end,
+})
+
+vim.api.nvim_create_autocmd({ "WinLeave", "BufLeave" }, {
+  group = augroup,
+  callback = function()
+    vim.opt_local.statusline = "  %f %h%m%r \u{e0b1} %{v:lua.file_type()} %=  %l:%c   %P "
+  end,
+})
+
+-- ============================================================================
+-- LSP
+-- ============================================================================
+
+local function setup_lsp()
+  local signs = {
+    Error = "\u{f06a} ", Warn = "\u{f071} ", Hint = "\u{f0eb} ", Info = "\u{f05a} "
+  }
+  for type, icon in pairs(signs) do
+    local hl = "DiagnosticSign" .. type
+    vim.fn.sign_define(hl, { text = icon, texthl = hl, numhl = hl })
+  end
+
+  vim.diagnostic.config({
+    virtual_text = { prefix = "●", spacing = 4 },
+    signs = true,
+    underline = true,
+    update_in_insert = false,
+    severity_sort = true,
+    float = { border = "rounded", source = "always", header = "", prefix = "" },
+  })
+
+  vim.api.nvim_create_autocmd("LspAttach", {
+    group = augroup,
+    callback = function(ev)
+      local opts = { buffer = ev.buf }
+      vim.keymap.set("n", "gD", vim.lsp.buf.declaration, opts)
+      vim.keymap.set("n", "gd", vim.lsp.buf.definition, opts)
+      vim.keymap.set("n", "K",  vim.lsp.buf.hover, opts)
+      vim.keymap.set("n", "gi", vim.lsp.buf.implementation, opts)
+      vim.keymap.set("n", "<leader>D",  vim.lsp.buf.type_definition, opts)
+      vim.keymap.set("n", "<leader>rn", vim.lsp.buf.rename, opts)
+      vim.keymap.set("n", "<leader>ca", vim.lsp.buf.code_action, opts)
+      vim.keymap.set("n", "gr", vim.lsp.buf.references, opts)
+      vim.keymap.set("n", "<leader>f", function()
+        vim.lsp.buf.format { async = true }
+      end, opts)
+    end,
+  })
+
+  local orig = vim.lsp.util.open_floating_preview
+  function vim.lsp.util.open_floating_preview(contents, syntax, opts, ...)
+    opts = opts or {}
+    opts.border = opts.border or "rounded"
+    return orig(contents, syntax, opts, ...)
+  end
+end
+
+vim.keymap.set("n", "pd", vim.diagnostic.goto_prev, { desc = "Previous diagnostic" })
+vim.keymap.set("n", "nd", vim.diagnostic.goto_next, { desc = "Next diagnostic" })
+vim.keymap.set("n", "<leader>q",  vim.diagnostic.setloclist,  { desc = "Open diagnostic list" })
+vim.keymap.set("n", "<leader>dl", vim.diagnostic.open_float,  { desc = "Show line diagnostics" })
+
+setup_lsp()
