@@ -103,9 +103,51 @@ vim.keymap.set("n", "<C-Up>",    ":resize +2<CR>",          { desc = "Increase w
 vim.keymap.set("n", "<C-Down>",  ":resize -2<CR>",          { desc = "Decrease window height" })
 vim.keymap.set("n", "<C-Left>",  ":vertical resize -2<CR>", { desc = "Decrease window width" })
 vim.keymap.set("n", "<C-Right>", ":vertical resize +2<CR>", { desc = "Increase window width" })
--- Move lines up/down
 
+-- Move lines up/down
 vim.keymap.set("n", "<A-j>", ":m .+1<CR>==",        { desc = "Move line down" })
 vim.keymap.set("n", "<A-k>", ":m .-2<CR>==",        { desc = "Move line up" })
 vim.keymap.set("v", "<A-j>", ":m '>+1<CR>gv=gv",   { desc = "Move selection down" })
 vim.keymap.set("v", "<A-k>", ":m '<-2<CR>gv=gv",   { desc = "Move selection up" })
+
+-- Better indenting in visual mode
+vim.keymap.set("v", "<", "<gv", { desc = "Indent left and reselect" })
+vim.keymap.set("v", ">", ">gv", { desc = "Indent right and reselect" })
+
+-- Quick file navigation
+vim.keymap.set("n", "<leader>e", ":Explore<CR>", { desc = "Open file explorer" })
+vim.keymap.set("n", "<leader>ff", ":find", { desc = "Find file" })
+
+-- Copy directory of current file
+vim.keymap.set("n", "<leader>pa", function()
+    local path = vim.fn.expand("%:p:h")
+    vim.fn.setreg("+", path)
+    print("dir:", path)
+end, { desc = "Copy file directory" })
+
+-- Quick config editing
+vim.keymap.set("n", "<leader>rc", ":e ~/.config/nvim/init.lua<CR>", { desc = "Edit config" })
+
+-- Highlight yanked text
+vim.api.nvim_create_autocmd("TextYankPost", {
+  group = augroup,
+  callback = function()
+    vim.highlight.on_yank()
+  end,
+})
+
+-- Return to last edit position when opening files
+vim.api.nvim_create_autocmd("BufReadPost", {
+  group = augroup,
+  callback = function()
+    local mark = vim.api.nvim_buf_get_mark(0, '"')
+    local lcount = vim.api.nvim_buf_line_count(0)
+    local line = mark[1]
+    local ft = vim.bo.filetype
+    if line > 0 and line <= lcount
+      and vim.fn.index({ "commit", "gitrebase", "xxd" }, ft) == -1
+      and not vim.o.diff then
+      pcall(vim.api.nvim_win_set_cursor, 0, mark)
+    end
+  end,
+})
