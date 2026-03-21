@@ -1,3 +1,7 @@
+-- Leader keys (must be set before loading lazy.nvim)
+vim.g.mapleader = " "
+vim.g.maplocalleader = " "
+
 require("config.lazy")
 
 -- Basic Settings
@@ -64,9 +68,6 @@ vim.opt.clipboard:append("unnamedplus") -- Use system clipboard
 vim.opt.modifiable = true        -- Allow buffer modifications
 vim.opt.encoding = "UTF-8"       -- Set encoding
 
--- Theme Settings
-vim.cmd [[colorscheme moonfly]]
-
 -- Cursor Settings
 vim.api.nvim_set_hl(0, "InsertCursor", { bg = "#FFFFFF" }) -- Must be after colorscheme
 vim.opt.guicursor = "n-v-c:block,i-ci-ve:ver20-InsertCursor-blinkwait100-blinkon200-blinkoff200,r-cr:hor20"
@@ -79,13 +80,10 @@ if vim.g.neovide then
   vim.g.neovide_cursor_vfx_mode = "railgun"            -- Cursor particle effect
   vim.g.neovide_cursor_animation_length = .10           -- Smooth cursor movement
   vim.g.neovide_cursor_animate_in_insert_mode = false     -- No animation while typing
+  vim.g.neovide_input_macos_option_key_is_meta = "both"  -- Option key acts as Alt/Meta
 end
 
 -- Keybindings
--- Key mappings
-vim.g.mapleader = " "        -- Set leader key to space
-vim.g.maplocalleader = " "   -- Set local leader key to space
-
 vim.keymap.set("n", "Y", "y$", { desc = "Yank to end of line" }) -- Set Y to copy till EOL 
 
 -- Center screen when jumping
@@ -105,3 +103,9 @@ vim.keymap.set("n", "<C-Up>",    ":resize +2<CR>",          { desc = "Increase w
 vim.keymap.set("n", "<C-Down>",  ":resize -2<CR>",          { desc = "Decrease window height" })
 vim.keymap.set("n", "<C-Left>",  ":vertical resize -2<CR>", { desc = "Decrease window width" })
 vim.keymap.set("n", "<C-Right>", ":vertical resize +2<CR>", { desc = "Increase window width" })
+-- Move lines up/down
+
+vim.keymap.set("n", "<A-j>", ":m .+1<CR>==",        { desc = "Move line down" })
+vim.keymap.set("n", "<A-k>", ":m .-2<CR>==",        { desc = "Move line up" })
+vim.keymap.set("v", "<A-j>", ":m '>+1<CR>gv=gv",   { desc = "Move selection down" })
+vim.keymap.set("v", "<A-k>", ":m '<-2<CR>gv=gv",   { desc = "Move selection up" })
