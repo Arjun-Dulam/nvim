@@ -5,6 +5,12 @@ vim.g.maplocalleader = " "
 require("config.lazy")
 
 -- Basic Settings
+-- number: shows absolute line numbers in the gutter
+-- relativenumber: shows distance to other lines (e.g. "3" means 3 lines away), useful for jumping with 3j/3k
+-- cursorline: highlights the entire line your cursor is on so you don't lose it
+-- wrap: disabled so long lines don't wrap around — they stay on one line and you scroll horizontally
+-- scrolloff: keeps 10 lines visible above/below your cursor so you're never editing at the edge of the screen
+-- sidescrolloff: same but horizontally — 8 columns always visible left/right of cursor
 vim.opt.number = true
 vim.opt.relativenumber = true
 vim.opt.cursorline = true      -- highlighting the line with cursor on it
@@ -13,6 +19,12 @@ vim.scrolloff = 10
 vim.sidescrolloff = 8
 
 -- Indentation
+-- tabstop: how wide a tab character looks (4 spaces wide)
+-- shiftwidth: how many spaces >> and << indent by
+-- softtabstop: how many spaces the Tab key inserts/deletes in insert mode
+-- expandtab: pressing Tab inserts spaces instead of a real tab character
+-- smartindent: automatically indents new lines based on code structure (e.g. after { or if)
+-- autoindent: new lines inherit the indentation of the line above
 vim.opt.tabstop = 4
 vim.opt.shiftwidth = 4
 vim.opt.softtabstop = 4
@@ -21,12 +33,30 @@ vim.opt.smartindent = true
 vim.opt.autoindent = true
 
 -- Searching
+-- ignorecase: /foo matches "foo", "Foo", "FOO" — case doesn't matter by default
+-- smartcase: if you type any uppercase letter (e.g. /Foo), case sensitivity turns back on automatically
+-- hlsearch: disabled so search matches don't stay highlighted after you're done searching
+-- incsearch: shows matches live as you type your search pattern
 vim.opt.ignorecase = true      -- Ignoring case when searching
 vim.opt.smartcase = true       -- Do not ignore case when upper case in search
 vim.opt.hlsearch = false       -- Do not highlight the search terms within the editor
 vim.opt.incsearch = true       -- Show matches as you type
 
 -- Visual Settings
+-- termguicolors: enables full 24-bit RGB colors — required for themes like moonfly to look correct
+-- signcolumn: always reserves a column on the left for signs (LSP errors, git changes) so the text doesn't jump around
+-- colorcolumn: draws a vertical line at column 100 as a reminder to keep lines from getting too long
+-- showmatch + matchtime: when you type a closing bracket/paren, briefly jumps to show the matching opener (for 0.2s)
+-- cmdheight: height of the command bar at the bottom (1 line is standard)
+-- completeopt: controls autocomplete popup behavior — show menu even for one match, don't auto-insert, don't auto-select
+-- showmode: disabled because the statusline already shows the current mode
+-- pumheight: autocomplete popup shows at most 10 items at once
+-- pumblend: autocomplete popup is 10% transparent
+-- winblend: floating windows (like LSP hover) are fully opaque (0 = no transparency)
+-- conceallevel: 0 means never hide markup characters (e.g. markdown asterisks stay visible)
+-- concealcursor: no concealment on the cursor line either
+-- lazyredraw: screen doesn't redraw while running macros, making them faster
+-- synmaxcol: only syntax-highlight the first 300 columns — avoids slowdown on very long lines
 vim.opt.termguicolors = true     -- Enable 24-bit colors
 vim.opt.signcolumn = "yes"       -- Always show sign column
 vim.opt.colorcolumn = "100"      -- Show column at 100 characters
@@ -44,6 +74,16 @@ vim.opt.lazyredraw = true        -- Don't redraw during macros
 vim.opt.synmaxcol = 300          -- Syntax highlighting limit
 
 -- Undo/Backup Settings
+-- backup + writebackup: both disabled — no need for backup files when using git
+-- swapfile: disabled — swap files are used to recover crashes but clutter your filesystem; git handles this better
+-- undofile: saves your undo history to disk, so even after closing and reopening a file you can still undo changes
+-- undodir: where those undo history files are stored
+-- updatetime: how long Neovim waits after you stop typing before writing the swap file / triggering CursorHold events
+--             300ms makes LSP feel more responsive
+-- timeoutlen: how long to wait for the next key in a multi-key mapping (e.g. <leader>bn) before giving up — 500ms
+-- ttimeoutlen: how long to wait for a key code sequence (e.g. escape sequences from terminal) — 0 means instant
+-- autoread: if a file changes on disk while you have it open, automatically reload it
+-- autowrite: disabled — files are only saved when you explicitly do so (:w)
 vim.opt.backup = false           -- Don't create backup files
 vim.opt.writebackup = false      -- Don't create backup before writing
 vim.opt.swapfile = false         -- Don't create swap files
@@ -56,6 +96,17 @@ vim.opt.autoread = true          -- Auto reload files changed outside vim
 vim.opt.autowrite = false        -- Don't auto save
 
 -- Behavior Settings
+-- hidden: lets you switch away from a buffer with unsaved changes without being forced to save or discard first
+-- errorbells: disabled — no beep/flash on errors
+-- backspace: makes backspace work intuitively in insert mode (can delete indentation, line breaks, and text before insert started)
+-- autochdir: disabled — Neovim's working directory stays fixed rather than following whichever file you open
+-- iskeyword "-": treats hyphen as part of a word, so dw on "my-variable" deletes the whole thing, not just "my"
+-- path "**": when using :find, searches recursively through all subdirectories
+-- selection: "exclusive" means the character under the cursor at the end of a selection is not included — standard behavior
+-- mouse: "a" enables mouse support in all modes (click to move cursor, scroll, resize splits)
+-- clipboard: uses the system clipboard, so yanking in Neovim copies to your Mac clipboard and vice versa
+-- modifiable: buffers can be edited (this is the default, but explicit)
+-- encoding: file encoding set to UTF-8
 vim.opt.hidden = true            -- Allow hidden buffers
 vim.opt.errorbells = false       -- No error bells
 vim.opt.backspace = "indent,eol,start" -- Better backspace behavior
@@ -69,11 +120,21 @@ vim.opt.modifiable = true        -- Allow buffer modifications
 vim.opt.encoding = "UTF-8"       -- Set encoding
 
 -- Cursor Settings
+-- InsertCursor: defines a white highlight group used to color the cursor in insert mode
+-- guicursor: sets cursor shape per mode —
+--   normal/visual/command: solid block
+--   insert: vertical bar (ver20 = 20% wide), white, blinking (100ms before blink starts, 200ms on, 200ms off)
+--   replace: horizontal underline (hor20 = 20% tall)
 vim.api.nvim_set_hl(0, "InsertCursor", { bg = "#FFFFFF" }) -- Must be after colorscheme
 vim.opt.guicursor = "n-v-c:block,i-ci-ve:ver20-InsertCursor-blinkwait100-blinkon200-blinkoff200,r-cr:hor20"
--- Block in normal, blinking vertical in insert, underline in replace
 
--- Neovide Settings
+-- Neovide Settings (only applied when running inside Neovide GUI, ignored in terminal Neovim)
+-- scroll_animation_length: how long the smooth scroll animation takes (0.15s — short and snappy)
+-- scroll_animation_far_lines: keeps animation consistent even when scrolling large distances
+-- cursor_vfx_mode: particle trail behind the cursor ("railgun" = fast streaking particles)
+-- cursor_animation_length: how long the cursor glide animation takes when moving (0.10s)
+-- cursor_animate_in_insert_mode: disabled — cursor doesn't animate while you're actively typing, only when moving
+-- input_macos_option_key_is_meta: makes the Option key act as Alt for key mappings like <A-j>/<A-k>
 if vim.g.neovide then
   vim.g.neovide_scroll_animation_length = 0.15   -- Short smooth scroll, no lingering friction
   vim.g.neovide_scroll_animation_far_lines = 1   -- Consistent animation on fast scroll
