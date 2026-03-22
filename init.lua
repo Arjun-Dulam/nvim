@@ -15,8 +15,8 @@ vim.opt.number = true
 vim.opt.relativenumber = true
 vim.opt.cursorline = true      -- highlighting the line with cursor on it
 vim.opt.wrap = false
-vim.scrolloff = 10
-vim.sidescrolloff = 8
+vim.opt.scrolloff = 10
+vim.opt.sidescrolloff = 8
 
 -- Indentation
 -- tabstop: how wide a tab character looks (4 spaces wide)
@@ -194,10 +194,7 @@ vim.keymap.set("v", "<", "<gv", { desc = "Indent left and reselect" })
 vim.keymap.set("v", ">", ">gv", { desc = "Indent right and reselect" })
 
 -- Quick file navigation
--- <leader>e opens netrw (Neovim's built-in file explorer) in the current directory.
--- <leader>ff starts a :find command which searches your path (including subdirectories via path=**)
-vim.keymap.set("n", "<leader>e", ":Explore<CR>", { desc = "Open file explorer" })
-vim.keymap.set("n", "<leader>ff", ":find", { desc = "Find file" })
+-- <leader>e and <leader>ff are handled by nvim-tree and telescope respectively (see plugins.lua)
 
 -- Path utilities — all copy to the system clipboard and print in the command bar
 -- pa: directory containing the current file (e.g. /Users/you/project/src)
