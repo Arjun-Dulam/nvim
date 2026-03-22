@@ -145,19 +145,32 @@ if vim.g.neovide then
 end
 
 -- Keybindings
-vim.keymap.set("n", "Y", "y$", { desc = "Yank to end of line" }) -- Set Y to copy till EOL 
+-- Leader key is Space. A "leader" mapping means you press Space first, then the rest of the keys.
+-- e.g. <leader>bn = Space + b + n
+
+-- Y: by default, Y does the same as yy (yank whole line). This remaps it to y$ so it yanks
+--    from the cursor to end of line — consistent with how D and C work.
+vim.keymap.set("n", "Y", "y$", { desc = "Yank to end of line" })
 
 -- Center screen when jumping
+-- After jumping to a search result or scrolling, the cursor can end up near the top or bottom
+-- of the screen. zz re-centers the view on your cursor. zv opens folds if needed.
+-- n/N: next/prev search match, then center. <C-d>/<C-u>: half-page scroll, then center.
 vim.keymap.set("n", "n", "nzzzv",   { desc = "Next search result (centered)" })
 vim.keymap.set("n", "N", "Nzzzv",   { desc = "Previous search result (centered)" })
 vim.keymap.set("n", "<C-d>", "<C-d>zz", { desc = "Half page down (centered)" })
 vim.keymap.set("n", "<C-u>", "<C-u>zz", { desc = "Half page up (centered)" })
 
 -- Buffer navigation
+-- Buffers are open files in memory. You can have many files open at once and switch between them.
+-- bn = buffer next, bp = buffer previous. Like browser tab switching but for files.
 vim.keymap.set("n", "<leader>bn", ":bnext<CR>",     { desc = "Next buffer" })
 vim.keymap.set("n", "<leader>bp", ":bprevious<CR>", { desc = "Previous buffer" })
 
 -- Splitting & Resizing
+-- Splits let you view multiple files (or different parts of the same file) side by side.
+-- sv = split vertical (two windows side by side), sh = split horizontal (stacked top/bottom).
+-- Arrow keys with Ctrl resize the focused split by 2 lines/columns at a time.
 vim.keymap.set("n", "<leader>sv", ":vsplit<CR>",            { desc = "Split window vertically" })
 vim.keymap.set("n", "<leader>sh", ":split<CR>",             { desc = "Split window horizontally" })
 vim.keymap.set("n", "<C-Up>",    ":resize +2<CR>",          { desc = "Increase window height" })
@@ -166,30 +179,39 @@ vim.keymap.set("n", "<C-Left>",  ":vertical resize -2<CR>", { desc = "Decrease w
 vim.keymap.set("n", "<C-Right>", ":vertical resize +2<CR>", { desc = "Increase window width" })
 
 -- Move lines up/down
+-- Option+j/k physically moves the current line (or selected lines in visual mode) up or down.
+-- The == after normal mode movement re-indents the line to match its new context.
+-- gv=gv in visual mode re-selects the moved block and re-indents it.
 vim.keymap.set("n", "<A-j>", ":m .+1<CR>==",        { desc = "Move line down" })
 vim.keymap.set("n", "<A-k>", ":m .-2<CR>==",        { desc = "Move line up" })
 vim.keymap.set("v", "<A-j>", ":m '>+1<CR>gv=gv",   { desc = "Move selection down" })
 vim.keymap.set("v", "<A-k>", ":m '<-2<CR>gv=gv",   { desc = "Move selection up" })
 
 -- Better indenting in visual mode
+-- By default, > and < indent/unindent but drop the selection so you have to reselect to do it again.
+-- gv reselects the previous visual selection, so you can keep pressing > or < to indent multiple levels.
 vim.keymap.set("v", "<", "<gv", { desc = "Indent left and reselect" })
 vim.keymap.set("v", ">", ">gv", { desc = "Indent right and reselect" })
 
 -- Quick file navigation
+-- <leader>e opens netrw (Neovim's built-in file explorer) in the current directory.
+-- <leader>ff starts a :find command which searches your path (including subdirectories via path=**)
 vim.keymap.set("n", "<leader>e", ":Explore<CR>", { desc = "Open file explorer" })
 vim.keymap.set("n", "<leader>ff", ":find", { desc = "Find file" })
 
--- Copy directory of current file
+-- Path utilities — all copy to the system clipboard and print in the command bar
+-- pa: directory containing the current file (e.g. /Users/you/project/src)
+-- pf: absolute full path (e.g. /Users/you/project/src/main.lua)
+-- pr: path relative to Neovim's working directory (e.g. src/main.lua)
 vim.keymap.set("n", "<leader>pa", function()
     local path = vim.fn.expand("%:p:h")
     vim.fn.setreg("+", path)
     print("dir:", path)
 end, { desc = "Copy file directory" })
 
--- Quick config editing
+-- Quick config editing — jump straight to init.lua from anywhere
 vim.keymap.set("n", "<leader>rc", ":e ~/.config/nvim/init.lua<CR>", { desc = "Edit config" })
 
--- Copy full / relative file path
 vim.keymap.set("n", "<leader>pf", function()
   local path = vim.fn.expand("%:p")
   vim.fn.setreg("+", path)
@@ -203,6 +225,8 @@ vim.keymap.set("n", "<leader>pr", function()
 end, { desc = "Copy relative file path" })
 
 -- Rename current file
+-- Prompts for a new name, saves the file under that name, then deletes the old file.
+-- Uses the current filename as the default so you can just edit it rather than retype.
 vim.keymap.set("n", "<leader>rr", function()
   local old = vim.fn.expand("%")
   local new = vim.fn.input("New file name: ", old)
@@ -214,13 +238,19 @@ vim.keymap.set("n", "<leader>rr", function()
 end, { desc = "Rename current file" })
 
 -- Tabs
+-- Tabs in Neovim are window layouts — each tab can have its own split arrangement.
+-- gt / gT (built-in) switch between tabs. tn = new tab, tx = close current tab.
 vim.keymap.set("n", "<leader>tn", ":tabnew<CR>",   { desc = "New tab" })
 vim.keymap.set("n", "<leader>tx", ":tabclose<CR>", { desc = "Close tab" })
 
 -- Autocmd group
+-- An augroup is a named container for autocmds. Using { clear = true } means if this file is
+-- re-sourced, the old autocmds are wiped first so they don't pile up and fire multiple times.
 local augroup = vim.api.nvim_create_augroup("UserConfig", { clear = true })
 
 -- Highlight yanked text
+-- After you yank (copy) text, briefly flashes a highlight over what was yanked so you can
+-- see exactly what got copied. The flash duration is controlled by vim.opt.updatetime (300ms).
 vim.api.nvim_create_autocmd("TextYankPost", {
   group = augroup,
   callback = function()
@@ -229,6 +259,9 @@ vim.api.nvim_create_autocmd("TextYankPost", {
 })
 
 -- Return to last edit position when opening files
+-- Neovim remembers where your cursor was when you last closed a file (stored in the shada file).
+-- This autocmd reads that saved position and jumps back to it when you reopen the file.
+-- Skips git commit/rebase buffers and diff mode where jumping would be confusing.
 vim.api.nvim_create_autocmd("BufReadPost", {
   group = augroup,
   callback = function()
@@ -245,6 +278,8 @@ vim.api.nvim_create_autocmd("BufReadPost", {
 })
 
 -- Auto-resize splits when Neovide window is resized
+-- When you drag the Neovide window to a new size, all open splits are re-equalized so they
+-- stay proportional rather than one becoming huge and another tiny.
 vim.api.nvim_create_autocmd("VimResized", {
   group = augroup,
   callback = function() vim.cmd("tabdo wincmd =") end,
@@ -253,7 +288,16 @@ vim.api.nvim_create_autocmd("VimResized", {
 -- ============================================================================
 -- STATUSLINE
 -- ============================================================================
+-- The statusline is the bar at the bottom of each window showing info about the current file.
+-- This replaces Neovim's default statusline with a custom one showing:
+--   mode | filename | git branch | filetype icon | file size | line:col | scroll %
+-- The active window gets a richer version; inactive windows get a simpler one so focus is clear.
+-- All the helper functions below are exposed as globals (_G.*) so the statusline string
+-- can call them via v:lua.function_name() — that's how Neovim evaluates Lua in statusline strings.
+-- Requires a Nerd Font for the icons to render correctly.
 
+-- git_branch: runs `git branch --show-current` and caches the result for 5 seconds
+--             so it's not shelling out on every single keystroke
 local cached_branch = ""
 local last_check = 0
 local function git_branch()
@@ -302,10 +346,29 @@ local function mode_icon()
   return modes[mode] or " \u{f059} " .. mode:upper()
 end
 
-_G.mode_icon  = mode_icon
-_G.git_branch = git_branch
-_G.file_type  = file_type
-_G.file_size  = file_size
+-- lsp_diagnostics: counts errors and warnings in the current buffer using Neovim's built-in
+-- diagnostic API. Returns an empty string when there are no issues.
+local function lsp_diagnostics()
+  local errors   = #vim.diagnostic.get(0, { severity = vim.diagnostic.severity.ERROR })
+  local warnings = #vim.diagnostic.get(0, { severity = vim.diagnostic.severity.WARN })
+  local result = ""
+  if errors   > 0 then result = result .. " \u{f06a} " .. errors   .. " " end
+  if warnings > 0 then result = result .. " \u{f071} " .. warnings .. " " end
+  return result
+end
+
+-- modified: shows a floppy disk icon when the buffer has unsaved changes, empty string otherwise
+local function modified()
+  if vim.bo.modified then return " \u{f0c7} " end
+  return ""
+end
+
+_G.mode_icon       = mode_icon
+_G.git_branch      = git_branch
+_G.file_type       = file_type
+_G.file_size       = file_size
+_G.lsp_diagnostics = lsp_diagnostics
+_G.modified        = modified
 
 vim.api.nvim_set_hl(0, "StatusLineBold", { bold = true })
 
@@ -314,9 +377,9 @@ vim.api.nvim_create_autocmd({ "WinEnter", "BufEnter" }, {
   callback = function()
     vim.opt_local.statusline = table.concat {
       "  ", "%#StatusLineBold#", "%{v:lua.mode_icon()}", "%#StatusLine#",
-      " \u{e0b1} %f %h%m%r", "%{v:lua.git_branch()}", "\u{e0b1} ",
+      " \u{e0b1} %f", "%{v:lua.git_branch()}", "\u{e0b1} ",
       "%{v:lua.file_type()}", "\u{e0b1} ", "%{v:lua.file_size()}",
-      "%=", " \u{f017} %l:%c  %P ",
+      "%=", "%{v:lua.lsp_diagnostics()}", "%{v:lua.modified()}", " \u{f017} %l:%c  %P ",
     }
   end,
 })
@@ -324,15 +387,22 @@ vim.api.nvim_create_autocmd({ "WinEnter", "BufEnter" }, {
 vim.api.nvim_create_autocmd({ "WinLeave", "BufLeave" }, {
   group = augroup,
   callback = function()
-    vim.opt_local.statusline = "  %f %h%m%r \u{e0b1} %{v:lua.file_type()} %=  %l:%c   %P "
+    vim.opt_local.statusline = "  %f \u{e0b1} %{v:lua.file_type()} %=  %{v:lua.modified()} %l:%c   %P "
   end,
 })
 
 -- ============================================================================
 -- LSP
 -- ============================================================================
+-- LSP (Language Server Protocol) is how Neovim talks to language-specific tools
+-- (e.g. a TypeScript server, a Lua language server) to get features like:
+--   go to definition, hover docs, rename symbol, find references, code actions, formatting.
+-- This setup_lsp() function configures how diagnostics (errors/warnings) are displayed
+-- and sets up keybindings that only activate when a language server actually attaches to a buffer.
+-- Language servers themselves are installed separately (e.g. via mason.nvim).
 
 local function setup_lsp()
+  -- signs: icons shown in the gutter (left column) next to lines that have errors/warnings/hints
   local signs = {
     Error = "\u{f06a} ", Warn = "\u{f071} ", Hint = "\u{f0eb} ", Info = "\u{f05a} "
   }
@@ -341,6 +411,13 @@ local function setup_lsp()
     vim.fn.sign_define(hl, { text = icon, texthl = hl, numhl = hl })
   end
 
+  -- diagnostic.config: controls how errors/warnings are shown
+  --   virtual_text: inline text shown to the right of the line with the issue (● prefix, 4 spaces indent)
+  --   signs: show icons in the gutter column
+  --   underline: squiggle under the problematic code
+  --   update_in_insert: false means diagnostics don't update while you're typing (less distraction)
+  --   severity_sort: errors show above warnings in lists
+  --   float: the popup that appears when you press <leader>dl — rounded border, always shows the source
   vim.diagnostic.config({
     virtual_text = { prefix = "●", spacing = 4 },
     signs = true,
@@ -350,6 +427,17 @@ local function setup_lsp()
     float = { border = "rounded", source = "always", header = "", prefix = "" },
   })
 
+  -- LspAttach: these keybindings are only set when a language server connects to the current buffer.
+  -- They won't exist in buffers with no LSP (e.g. plain text files).
+  --   gd: jump to where a function/variable is defined
+  --   gD: jump to where it's declared (different from definition in some languages like C)
+  --   K: show hover documentation popup for whatever's under the cursor
+  --   gi: go to implementation (e.g. the concrete class that implements an interface)
+  --   <leader>D: go to the type definition of a variable
+  --   <leader>rn: rename symbol everywhere it's used across the codebase
+  --   <leader>ca: show code actions (quick fixes, import suggestions, etc.)
+  --   gr: show all references to the symbol under the cursor
+  --   <leader>f: format the entire file using the language server's formatter
   vim.api.nvim_create_autocmd("LspAttach", {
     group = augroup,
     callback = function(ev)
@@ -368,6 +456,7 @@ local function setup_lsp()
     end,
   })
 
+  -- Patches all LSP floating windows (hover docs, signature help) to use rounded borders
   local orig = vim.lsp.util.open_floating_preview
   function vim.lsp.util.open_floating_preview(contents, syntax, opts, ...)
     opts = opts or {}
@@ -376,6 +465,10 @@ local function setup_lsp()
   end
 end
 
+-- Diagnostic navigation — available in all buffers, not just ones with LSP
+-- pd/nd: jump to the previous/next diagnostic (error or warning) in the file
+-- <leader>q: dump all diagnostics into the location list (a scrollable panel)
+-- <leader>dl: open a floating popup showing the full diagnostic message for the current line
 vim.keymap.set("n", "pd", vim.diagnostic.goto_prev, { desc = "Previous diagnostic" })
 vim.keymap.set("n", "nd", vim.diagnostic.goto_next, { desc = "Next diagnostic" })
 vim.keymap.set("n", "<leader>q",  vim.diagnostic.setloclist,  { desc = "Open diagnostic list" })
