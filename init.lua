@@ -186,6 +186,12 @@ vim.keymap.set("i", "<M-Right>", "<C-o>w",         { desc = "Jump to next word" 
 vim.keymap.set("n", "<M-Left>",  "b",              { desc = "Jump to previous word" })
 vim.keymap.set("n", "<M-Right>", "w",              { desc = "Jump to next word" })
 
+-- Command key line/file navigation (macOS muscle memory)
+vim.keymap.set({ "n", "i" }, "<D-Left>",  "<Home>",       { desc = "Beginning of line" })
+vim.keymap.set({ "n", "i" }, "<D-Right>", "<End>",        { desc = "End of line" })
+vim.keymap.set({ "n", "i" }, "<D-Up>",    "<C-Home>",     { desc = "Beginning of file" })
+vim.keymap.set({ "n", "i" }, "<D-Down>",  "<C-End>",      { desc = "End of file" })
+
 -- Move lines up/down
 -- Option+j/k physically moves the current line (or selected lines in visual mode) up or down.
 -- The == after normal mode movement re-indents the line to match its new context.
