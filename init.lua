@@ -187,10 +187,14 @@ vim.keymap.set("n", "<M-Left>",  "b",              { desc = "Jump to previous wo
 vim.keymap.set("n", "<M-Right>", "w",              { desc = "Jump to next word" })
 
 -- Command key line/file navigation (macOS muscle memory)
-vim.keymap.set({ "n", "i" }, "<D-Left>",  "<Home>",       { desc = "Beginning of line" })
-vim.keymap.set({ "n", "i" }, "<D-Right>", "<End>",        { desc = "End of line" })
-vim.keymap.set({ "n", "i" }, "<D-Up>",    "<C-Home>",     { desc = "Beginning of file" })
-vim.keymap.set({ "n", "i" }, "<D-Down>",  "<C-End>",      { desc = "End of file" })
+vim.keymap.set("n", "<D-Left>",  "^",               { desc = "Beginning of line" })
+vim.keymap.set("n", "<D-Right>", "$",               { desc = "End of line" })
+vim.keymap.set("n", "<D-Up>",    "gg",              { desc = "Beginning of file" })
+vim.keymap.set("n", "<D-Down>",  "G",               { desc = "End of file" })
+vim.keymap.set("i", "<D-Left>",  "<C-o>^",          { desc = "Beginning of line" })
+vim.keymap.set("i", "<D-Right>", "<C-o>$",          { desc = "End of line" })
+vim.keymap.set("i", "<D-Up>",    "<C-o>gg",         { desc = "Beginning of file" })
+vim.keymap.set("i", "<D-Down>",  "<C-o>G",          { desc = "End of file" })
 
 -- Move lines up/down
 -- Option+j/k physically moves the current line (or selected lines in visual mode) up or down.
