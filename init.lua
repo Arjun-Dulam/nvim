@@ -19,15 +19,15 @@ vim.opt.scrolloff = 10
 vim.opt.sidescrolloff = 8
 
 -- Indentation
--- tabstop: how wide a tab character looks (4 spaces wide)
+-- tabstop: how wide a tab character looks (2 spaces wide)
 -- shiftwidth: how many spaces >> and << indent by
 -- softtabstop: how many spaces the Tab key inserts/deletes in insert mode
 -- expandtab: pressing Tab inserts spaces instead of a real tab character
 -- smartindent: automatically indents new lines based on code structure (e.g. after { or if)
 -- autoindent: new lines inherit the indentation of the line above
-vim.opt.tabstop = 4
-vim.opt.shiftwidth = 4
-vim.opt.softtabstop = 4
+vim.opt.tabstop = 2
+vim.opt.shiftwidth = 2
+vim.opt.softtabstop = 2
 vim.opt.expandtab = true
 vim.opt.smartindent = true
 vim.opt.autoindent = true
@@ -177,6 +177,14 @@ vim.keymap.set("n", "<C-Up>",    ":resize +2<CR>",          { desc = "Increase w
 vim.keymap.set("n", "<C-Down>",  ":resize -2<CR>",          { desc = "Decrease window height" })
 vim.keymap.set("n", "<C-Left>",  ":vertical resize -2<CR>", { desc = "Decrease window width" })
 vim.keymap.set("n", "<C-Right>", ":vertical resize +2<CR>", { desc = "Increase window width" })
+
+-- Option key text editing (macOS muscle memory)
+vim.keymap.set("i", "<M-BS>",    "<C-w>",          { desc = "Delete previous word" })
+vim.keymap.set("i", "<M-Del>",   "<C-o>dw",        { desc = "Delete next word" })
+vim.keymap.set("i", "<M-Left>",  "<C-o>b",         { desc = "Jump to previous word" })
+vim.keymap.set("i", "<M-Right>", "<C-o>w",         { desc = "Jump to next word" })
+vim.keymap.set("n", "<M-Left>",  "b",              { desc = "Jump to previous word" })
+vim.keymap.set("n", "<M-Right>", "w",              { desc = "Jump to next word" })
 
 -- Move lines up/down
 -- Option+j/k physically moves the current line (or selected lines in visual mode) up or down.

@@ -21,9 +21,10 @@ return {
   -- Lspconfig: language server configurations
   {
     "neovim/nvim-lspconfig",
-    dependencies = { "williamboman/mason-lspconfig.nvim" },
+    dependencies = { "williamboman/mason-lspconfig.nvim", "hrsh7th/cmp-nvim-lsp" },
     config = function()
-      vim.lsp.config("clangd", {})
+      local capabilities = require("cmp_nvim_lsp").default_capabilities()
+      vim.lsp.config("clangd", { capabilities = capabilities })
       vim.lsp.enable("clangd")
     end,
   },
@@ -103,7 +104,7 @@ return {
         },
         formatters = {
           ["clang-format"] = {
-            args = { "--style=Google" },
+            args = { "--style={BasedOnStyle: Google, IndentWidth: 2}" },
           },
         },
         format_on_save = {
@@ -120,23 +121,8 @@ return {
     },
   },
 
-  -- nvim-lint: linting
-  {
-    "mfussenegger/nvim-lint",
-    event = "BufReadPost",
-    config = function()
-      local lint = require("lint")
-      lint.linters_by_ft = {
-        cpp = { "clang-tidy" },
-        c = { "clang-tidy" },
-      }
-      vim.api.nvim_create_autocmd({ "BufWritePost" }, {
-        callback = function()
-          lint.try_lint()
-        end,
-      })
-    end,
-  },
+  -- nvim-lint: disabled — clangd LSP already provides real-time diagnostics
+  -- { "mfussenegger/nvim-lint" },
 
   -- cmake-tools: CMake integration
   {
@@ -150,5 +136,79 @@ return {
       { "<leader>cc", ":CMakeRun<CR>", desc = "CMake run" },
       { "<leader>cq", ":CMakeClose<CR>", desc = "CMake close" },
     },
+  },
+
+  -- nvim-autopairs: auto-close brackets and quotes
+  {
+    "windwp/nvim-autopairs",
+    event = "InsertEnter",
+    config = function()
+      require("nvim-autopairs").setup()
+    end,
+  },
+
+  -- LuaSnip: snippet engine
+  {
+    "L3MON4D3/LuaSnip",
+    dependencies = { "rafamadriz/friendly-snippets" },
+    config = function()
+      require("luasnip.loaders.from_vscode").lazy_load()
+    end,
+  },
+
+  -- nvim-cmp: completion engine
+  {
+    "hrsh7th/nvim-cmp",
+    event = "InsertEnter",
+    dependencies = {
+      "hrsh7th/cmp-nvim-lsp",
+      "hrsh7th/cmp-buffer",
+      "hrsh7th/cmp-path",
+      "saadparwaiz1/cmp_luasnip",   -- Snippet completions
+      "hrsh7th/cmp-nvim-lsp-signature-help", -- Function signature while typing
+    },
+    config = function()
+      local cmp = require("cmp")
+      local luasnip = require("luasnip")
+      cmp.setup({
+        snippet = {
+          expand = function(args)
+            luasnip.lsp_expand(args.body)
+          end,
+        },
+        sources = cmp.config.sources({
+          { name = "nvim_lsp", priority = 100 },
+          { name = "nvim_lsp_signature_help", priority = 90 },
+          { name = "luasnip", priority = 80 },
+          { name = "buffer", priority = 50 },
+          { name = "path", priority = 40 },
+        }),
+        mapping = cmp.mapping.preset.insert({
+          ["<C-b>"] = cmp.mapping.scroll_docs(-4),
+          ["<C-f>"] = cmp.mapping.scroll_docs(4),
+          ["<C-Space>"] = cmp.mapping.complete(),
+          ["<C-e>"] = cmp.mapping.abort(),
+          ["<CR>"] = cmp.mapping.confirm({ select = true }),
+          ["<Tab>"] = cmp.mapping(function(fallback)
+            if cmp.visible() then
+              cmp.select_next_item()
+            elseif luasnip.expand_or_jumpable() then
+              luasnip.expand_or_jump()
+            else
+              fallback()
+            end
+          end, { "i", "s" }),
+          ["<S-Tab>"] = cmp.mapping(function(fallback)
+            if cmp.visible() then
+              cmp.select_prev_item()
+            elseif luasnip.jumpable(-1) then
+              luasnip.jump(-1)
+            else
+              fallback()
+            end
+          end, { "i", "s" }),
+        }),
+      })
+    end,
   },
 }
