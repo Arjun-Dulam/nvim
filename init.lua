@@ -196,7 +196,8 @@ vim.keymap.set("i", "<D-Right>", "<C-o>$",          { desc = "End of line" })
 vim.keymap.set("i", "<D-Up>",    "<C-o>gg",         { desc = "Beginning of file" })
 vim.keymap.set("i", "<D-Down>",  "<C-o>G",          { desc = "End of file" })
 vim.keymap.set("i", "<D-x>",     "<C-o>dd",         { desc = "Delete line" })
-vim.keymap.set({ "n", "i" }, "<D-s>",     ":w<CR>",        { desc = "Save file" })
+vim.keymap.set("n", "<D-s>", ":w<CR>", { desc = "Save file" })
+vim.keymap.set("i", "<D-s>", function() vim.cmd("w") end, { desc = "Save file" })
 
 -- Move lines up/down
 -- Option+j/k physically moves the current line (or selected lines in visual mode) up or down.
