@@ -168,6 +168,23 @@ return {
     },
   },
 
+  -- protobuf.vim: syntax highlighting and indent for protobuf/gRPC
+  { "wfxr/protobuf.vim", ft = "proto" },
+
+  -- persistence.nvim: auto-save and restore sessions per directory
+  {
+    "folke/persistence.nvim",
+    event = "BufReadPre",
+    config = function()
+      require("persistence").setup()
+    end,
+    keys = {
+      { "<leader>qs", function() require("persistence").load() end, desc = "Restore session" },
+      { "<leader>ql", function() require("persistence").load({ last = true }) end, desc = "Restore last session" },
+      { "<leader>qd", function() require("persistence").stop() end, desc = "Stop persistence" },
+    },
+  },
+
   -- nvim-autopairs: auto-close brackets and quotes
   {
     "windwp/nvim-autopairs",
