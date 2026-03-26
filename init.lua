@@ -63,6 +63,7 @@ vim.opt.colorcolumn = "100"      -- Show column at 100 characters
 vim.opt.showmatch = true         -- Highlight matching brackets
 vim.opt.matchtime = 2            -- How long to show matching bracket
 vim.opt.cmdheight = 1            -- Command line height
+vim.opt.laststatus = 0           -- Hide bottom statusline (using winbar at top instead)
 vim.opt.completeopt = "menuone,noinsert,noselect" -- Completion options
 vim.opt.showmode = false         -- Don't show mode in command line
 vim.opt.pumheight = 10           -- Popup menu height
