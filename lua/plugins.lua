@@ -161,7 +161,10 @@ return {
           lualine_c = { { "filename", path = 1 } },
         },
       })
-      vim.opt.laststatus = 0
+      vim.opt.laststatus = 3
+      vim.api.nvim_set_hl(0, "StatusLine", { bg = "NONE", fg = "NONE" })
+      vim.api.nvim_set_hl(0, "StatusLineNC", { bg = "NONE", fg = "NONE" })
+      vim.opt.statusline = " "
     end,
   },
 
