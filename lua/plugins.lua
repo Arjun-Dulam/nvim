@@ -104,6 +104,7 @@ return {
           cpp = { "clang-format" },
           c = { "clang-format" },
           proto = { "buf" },
+          cmake = { "cmake_format" },
         },
         formatters = {
           ["clang-format"] = {
@@ -156,11 +157,9 @@ return {
           lualine_y = { "progress" },
           lualine_z = { "location" },
         },
-        inactive_winbar = {
-          lualine_c = { { "filename", path = 1 } },
-          lualine_x = { "location" },
-        },
+        inactive_winbar = {},
       })
+      vim.opt.laststatus = 3
     end,
   },
 
@@ -183,6 +182,20 @@ return {
 
   -- protobuf.vim: syntax highlighting and indent for protobuf/gRPC
   { "wfxr/protobuf.vim", ft = "proto" },
+
+  -- markview.nvim: in-buffer markdown renderer with splitview support
+  {
+    "OXY2DEV/markview.nvim",
+    ft = "markdown",
+    dependencies = { "nvim-treesitter/nvim-treesitter" },
+    config = function()
+      require("markview").setup()
+    end,
+    keys = {
+      { "<leader>mp", ":Markview toggle<CR>",      desc = "Toggle markdown preview" },
+      { "<leader>ms", ":Markview splitToggle<CR>", desc = "Toggle markdown splitview" },
+    },
+  },
 
   -- persistence.nvim: auto-save and restore sessions per directory
   {
