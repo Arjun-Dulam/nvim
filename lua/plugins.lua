@@ -101,6 +101,7 @@ return {
         formatters_by_ft = {
           cpp = { "clang-format" },
           c = { "clang-format" },
+          proto = { "buf" },
         },
         formatters = {
           ["clang-format"] = {
