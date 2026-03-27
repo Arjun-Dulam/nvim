@@ -64,7 +64,9 @@ vim.opt.showmatch = true         -- Highlight matching brackets
 vim.opt.matchtime = 2            -- How long to show matching bracket
 vim.opt.cmdheight = 1            -- Command line height
 vim.opt.laststatus = 3           -- Global statusline (removes per-split statuslines)
-vim.opt.showtabline = 0          -- Hide native tabline
+vim.opt.fillchars:append("horiz:─,horizup:─,horizdown:─,vert:│,vertleft:│,vertright:│")
+vim.api.nvim_set_hl(0, "WinSeparator", { fg = "#444444", bg = "NONE" })
+vim.opt.showtabline = 2          -- Always show tabline
 vim.opt.completeopt = "menuone,noinsert,noselect" -- Completion options
 vim.opt.showmode = false         -- Don't show mode in command line
 vim.opt.pumheight = 10           -- Popup menu height
@@ -270,6 +272,14 @@ vim.keymap.set("n", "<leader>tx", ":tabclose<CR>", { desc = "Close tab" })
 -- An augroup is a named container for autocmds. Using { clear = true } means if this file is
 -- re-sourced, the old autocmds are wiped first so they don't pile up and fire multiple times.
 local augroup = vim.api.nvim_create_augroup("UserConfig", { clear = true })
+
+vim.api.nvim_create_autocmd("FileType", {
+  group = augroup,
+  pattern = "markdown",
+  callback = function()
+    vim.opt_local.colorcolumn = ""
+  end,
+})
 
 -- Highlight yanked text
 -- After you yank (copy) text, briefly flashes a highlight over what was yanked so you can
