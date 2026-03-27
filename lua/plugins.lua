@@ -13,7 +13,7 @@ return {
     dependencies = { "mason.nvim" },
     config = function()
       require("mason-lspconfig").setup({
-        ensure_installed = { "clangd" },
+        ensure_installed = { "clangd", "protols" },
       })
     end,
   },
@@ -25,7 +25,9 @@ return {
     config = function()
       local capabilities = require("cmp_nvim_lsp").default_capabilities()
       vim.lsp.config("clangd", { capabilities = capabilities })
+      vim.lsp.config("protols", { capabilities = capabilities })
       vim.lsp.enable("clangd")
+      vim.lsp.enable("protols")
     end,
   },
 
@@ -106,6 +108,16 @@ return {
         formatters = {
           ["clang-format"] = {
             args = { "--style={BasedOnStyle: Google, IndentWidth: 2}" },
+          },
+          ["buf"] = {
+            command = "buf",
+            args = function(self, ctx)
+              return { "format", ctx.filename }
+            end,
+            stdin = false,
+            cwd = function(self, ctx)
+              return vim.fn.fnamemodify(ctx.filename, ":h")
+            end,
           },
         },
         format_on_save = {
