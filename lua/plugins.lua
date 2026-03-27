@@ -157,9 +157,11 @@ return {
           lualine_y = { "progress" },
           lualine_z = { "location" },
         },
-        inactive_winbar = {},
+        inactive_winbar = {
+          lualine_c = { { "filename", path = 1 } },
+        },
       })
-      vim.opt.laststatus = 3
+      vim.opt.laststatus = 0
     end,
   },
 

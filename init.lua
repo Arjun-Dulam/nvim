@@ -63,7 +63,7 @@ vim.opt.colorcolumn = "100"      -- Show column at 100 characters
 vim.opt.showmatch = true         -- Highlight matching brackets
 vim.opt.matchtime = 2            -- How long to show matching bracket
 vim.opt.cmdheight = 1            -- Command line height
-vim.opt.laststatus = 3           -- Global statusline (removes per-split statuslines)
+vim.opt.laststatus = 0           -- Hide statusline entirely
 vim.opt.fillchars:append("horiz:─,horizup:─,horizdown:─,vert:│,vertleft:│,vertright:│")
 vim.api.nvim_set_hl(0, "WinSeparator", { fg = "#444444", bg = "NONE" })
 vim.opt.showtabline = 2          -- Always show tabline
