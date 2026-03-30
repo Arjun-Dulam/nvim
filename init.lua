@@ -140,6 +140,7 @@ vim.opt.guicursor = "n-v-c:block,i-ci-ve:ver20-InsertCursor-blinkwait100-blinkon
 -- cursor_animate_in_insert_mode: disabled — cursor doesn't animate while you're actively typing, only when moving
 -- input_macos_option_key_is_meta: makes the Option key act as Alt for key mappings like <A-j>/<A-k>
 if vim.g.neovide then
+  vim.o.guifont = "JetBrainsMono Nerd Font Mono:h14"
   vim.g.neovide_scroll_animation_length = 0.15   -- Short smooth scroll, no lingering friction
   vim.g.neovide_scroll_animation_far_lines = 1   -- Consistent animation on fast scroll
   vim.g.neovide_cursor_vfx_mode = "railgun"            -- Cursor particle effect
