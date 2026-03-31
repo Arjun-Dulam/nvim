@@ -175,29 +175,31 @@ return {
   -- protobuf.vim: syntax highlighting and indent for protobuf/gRPC
   { "wfxr/protobuf.vim", ft = "proto" },
 
-  -- nvim-treesitter: syntax parsing with textobjects for C/C++
+  -- nvim-treesitter: parser installation and queries (highlight is built-in to Neovim now)
   {
     "nvim-treesitter/nvim-treesitter",
     build = ":TSUpdate",
-    event = { "BufReadPost", "BufNewFile" },
-    main = "nvim-treesitter.configs",
-    dependencies = { "nvim-treesitter/nvim-treesitter-textobjects" },
-    opts = {
-      ensure_installed = { "c", "cpp", "lua", "proto" },
-      highlight = { enable = true },
-      textobjects = {
-        select = {
-          enable = true,
-          lookahead = true,
-          keymaps = {
-            ["af"] = { query = "@function.outer", desc = "around function" },
-            ["if"] = { query = "@function.inner", desc = "inner function" },
-            ["ac"] = { query = "@class.outer", desc = "around class" },
-            ["ic"] = { query = "@class.inner", desc = "inner class" },
-          },
-        },
-      },
-    },
+  },
+
+  -- nvim-treesitter-textobjects: af/if/ac/ic textobjects for functions and classes
+  {
+    "nvim-treesitter/nvim-treesitter-textobjects",
+    dependencies = { "nvim-treesitter/nvim-treesitter" },
+    config = function()
+      require("nvim-treesitter-textobjects").setup({ select = { lookahead = true } })
+      local select = require("nvim-treesitter-textobjects.select")
+      local keymaps = {
+        ["af"] = "@function.outer",
+        ["if"] = "@function.inner",
+        ["ac"] = "@class.outer",
+        ["ic"] = "@class.inner",
+      }
+      for key, query in pairs(keymaps) do
+        vim.keymap.set({ "x", "o" }, key, function()
+          select.select_textobject(query, "textobjects")
+        end)
+      end
+    end,
   },
 
   -- markview.nvim: in-buffer markdown renderer with splitview support
