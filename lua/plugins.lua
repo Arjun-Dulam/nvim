@@ -171,19 +171,6 @@ return {
   -- nvim-lint: disabled — clangd LSP already provides real-time diagnostics
   -- { "mfussenegger/nvim-lint" },
 
-  -- cmake-tools: CMake integration
-  {
-    "Civitasv/cmake-tools.nvim",
-    dependencies = { "nvim-lua/plenary.nvim" },
-    config = function()
-      require("cmake-tools").setup()
-    end,
-    keys = {
-      { "<leader>cb", ":CMakeBuild<CR>", desc = "CMake build" },
-      { "<leader>cc", ":CMakeRun<CR>", desc = "CMake run" },
-      { "<leader>cq", ":CMakeClose<CR>", desc = "CMake close" },
-    },
-  },
 
   -- protobuf.vim: syntax highlighting and indent for protobuf/gRPC
   { "wfxr/protobuf.vim", ft = "proto" },
