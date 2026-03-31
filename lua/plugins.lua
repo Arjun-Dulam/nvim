@@ -175,11 +175,35 @@ return {
   -- protobuf.vim: syntax highlighting and indent for protobuf/gRPC
   { "wfxr/protobuf.vim", ft = "proto" },
 
+  -- nvim-treesitter: syntax parsing with textobjects for C/C++
+  {
+    "nvim-treesitter/nvim-treesitter",
+    build = ":TSUpdate",
+    event = { "BufReadPost", "BufNewFile" },
+    main = "nvim-treesitter.configs",
+    dependencies = { "nvim-treesitter/nvim-treesitter-textobjects" },
+    opts = {
+      ensure_installed = { "c", "cpp", "lua", "proto" },
+      highlight = { enable = true },
+      textobjects = {
+        select = {
+          enable = true,
+          lookahead = true,
+          keymaps = {
+            ["af"] = { query = "@function.outer", desc = "around function" },
+            ["if"] = { query = "@function.inner", desc = "inner function" },
+            ["ac"] = { query = "@class.outer", desc = "around class" },
+            ["ic"] = { query = "@class.inner", desc = "inner class" },
+          },
+        },
+      },
+    },
+  },
+
   -- markview.nvim: in-buffer markdown renderer with splitview support
   {
     "OXY2DEV/markview.nvim",
     ft = "markdown",
-    dependencies = { "nvim-treesitter/nvim-treesitter" },
     config = function()
       require("markview").setup()
     end,
