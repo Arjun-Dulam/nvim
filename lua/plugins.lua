@@ -217,7 +217,7 @@ return {
                   if tab == current then label = "● " .. label end
                   table.insert(parts, label)
                 end
-                return table.concat(parts, "   ")
+                return table.concat(parts, "  │  ")
               end,
             },
           },
