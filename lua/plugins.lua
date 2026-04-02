@@ -214,11 +214,11 @@ return {
                     if name == "" then name = "[No Name]" end
                   end
                   local label = i .. ": " .. name
-                  if tab == current then label = "● " .. label end
                   table.insert(parts, label)
                 end
-                return table.concat(parts, "  │  ")
+                return table.concat(parts, " │ ")
               end,
+              padding = { left = 1, right = 1 },
             },
           },
         },
