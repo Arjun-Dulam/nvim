@@ -197,9 +197,30 @@ return {
           lualine_z = { battery, datetime },
         },
         inactive_sections = {},
-        -- tabline: only real vim tabs (:tabnew), not buffers
+        -- tabline: vim tabs with optional custom names (set via <leader>tr)
         tabline = {
-          lualine_a = { "tabs" },
+          lualine_a = {
+            {
+              function()
+                local tabs = vim.api.nvim_list_tabpages()
+                local current = vim.api.nvim_get_current_tabpage()
+                local parts = {}
+                for i, tab in ipairs(tabs) do
+                  local ok, name = pcall(vim.api.nvim_tabpage_get_var, tab, "tab_name")
+                  if not ok or name == "" then
+                    local win = vim.api.nvim_tabpage_get_win(tab)
+                    local buf = vim.api.nvim_win_get_buf(win)
+                    name = vim.fn.fnamemodify(vim.api.nvim_buf_get_name(buf), ":t")
+                    if name == "" then name = "[No Name]" end
+                  end
+                  local label = i .. ": " .. name
+                  if tab == current then label = "● " .. label end
+                  table.insert(parts, label)
+                end
+                return table.concat(parts, "   ")
+              end,
+            },
+          },
         },
         -- per-window bar: mode, git, filename, filetype, position
         winbar = {

@@ -268,6 +268,13 @@ end, { desc = "Rename current file" })
 -- gt / gT (built-in) switch between tabs. tn = new tab, tx = close current tab.
 vim.keymap.set("n", "<leader>tn", ":tabnew<CR>",   { desc = "New tab" })
 vim.keymap.set("n", "<leader>tx", ":tabclose<CR>", { desc = "Close tab" })
+vim.keymap.set("n", "<leader>tr", function()
+  local name = vim.fn.input("Tab name: ")
+  if name ~= "" then vim.api.nvim_tabpage_set_var(0, "tab_name", name) end
+end, { desc = "Rename tab" })
+vim.keymap.set("n", "<leader>tR", function()
+  vim.api.nvim_tabpage_set_var(0, "tab_name", "")
+end, { desc = "Reset tab name" })
 
 -- Autocmd group
 -- An augroup is a named container for autocmds. Using { clear = true } means if this file is
