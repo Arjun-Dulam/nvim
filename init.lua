@@ -66,7 +66,7 @@ vim.opt.cmdheight = 1            -- Command line height
 vim.opt.laststatus = 3           -- Global statusline (prevents per-split statuslines)
 vim.opt.fillchars:append("horiz:─,horizup:─,horizdown:─,vert:│,vertleft:│,vertright:│")
 vim.api.nvim_set_hl(0, "WinSeparator", { fg = "#444444", bg = "NONE" })
-vim.opt.showtabline = 0          -- Hide native tabline (lualine winbar handles filename display)
+vim.opt.showtabline = 2          -- Always show tabline (managed by lualine)
 vim.opt.completeopt = "menuone,noinsert,noselect" -- Completion options
 vim.opt.showmode = false         -- Don't show mode in command line
 vim.opt.pumheight = 10           -- Popup menu height

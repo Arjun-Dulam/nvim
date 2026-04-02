@@ -149,15 +149,59 @@ return {
     "nvim-lualine/lualine.nvim",
     dependencies = { "nvim-tree/nvim-web-devicons" },
     config = function()
+      local function project_name()
+        return " " .. vim.fn.fnamemodify(vim.fn.getcwd(), ":t")
+      end
+
+      local function datetime()
+        return " " .. os.date("%a %H:%M:%S")
+      end
+
+      -- Battery is cached and refreshed every 60s to avoid spawning a
+      -- subprocess on every buffer switch.
+      local cached_battery = ""
+      local function refresh_battery()
+        local raw = vim.fn.system("pmset -g batt 2>/dev/null")
+        local pct_str = raw:match("(%d+)%%")
+        if not pct_str then
+          cached_battery = ""
+          return
+        end
+        local n = tonumber(pct_str) or 0
+        local icon = n > 80 and "" or n > 50 and "" or n > 20 and "" or ""
+        cached_battery = icon .. " " .. pct_str .. "%%"
+      end
+      refresh_battery()
+      local battery_timer = vim.uv.new_timer()
+      battery_timer:start(60000, 60000, vim.schedule_wrap(refresh_battery))
+
+      local function battery()
+        return cached_battery
+      end
+
       require("lualine").setup({
         options = {
           icons_enabled = true,
           theme = "auto",
           component_separators = { left = "", right = "" },
           section_separators = { left = "", right = "" },
+          refresh = { statusline = 1000, tabline = 1000, winbar = 1000 },
         },
-        sections = {},
+        -- global statusline: project name | datetime + battery
+        sections = {
+          lualine_a = { project_name },
+          lualine_b = {},
+          lualine_c = {},
+          lualine_x = {},
+          lualine_y = {},
+          lualine_z = { battery, datetime },
+        },
         inactive_sections = {},
+        -- tabline: only real vim tabs (:tabnew), not buffers
+        tabline = {
+          lualine_a = { "tabs" },
+        },
+        -- per-window bar: mode, git, filename, filetype, position
         winbar = {
           lualine_a = { "mode" },
           lualine_b = { "branch", "diff", "diagnostics" },
@@ -171,9 +215,9 @@ return {
         },
       })
       vim.opt.laststatus = 3
+      vim.opt.showtabline = 2
       vim.api.nvim_set_hl(0, "StatusLine", { bg = "NONE", fg = "NONE" })
       vim.api.nvim_set_hl(0, "StatusLineNC", { bg = "NONE", fg = "NONE" })
-      vim.opt.statusline = " "
     end,
   },
 
