@@ -1,4 +1,13 @@
 return {
+  -- which-key.nvim: displays available keybindings in a popup
+  {
+    "folke/which-key.nvim",
+    event = "VeryLazy",
+    config = function()
+      require("which-key").setup()
+    end,
+  },
+
   -- Mason: package manager for language servers, linters, formatters
   {
     "williamboman/mason.nvim",
