@@ -21,4 +21,6 @@ Personal Neovim setup built for C++/Protobuf development. Managed via [lazy.nvim
 | Markdown | markview.nvim |
 | Keybinding hints | which-key.nvim |
 | Colorscheme | moonfly |
+| Auto-pairs | nvim-autopairs |
+| Protobuf syntax | protobuf.vim |
 
