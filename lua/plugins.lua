@@ -201,24 +201,21 @@ return {
         tabline = {
           lualine_a = {
             {
-              function()
-                local tabs = vim.api.nvim_list_tabpages()
-                local current = vim.api.nvim_get_current_tabpage()
-                local parts = {}
-                for i, tab in ipairs(tabs) do
-                  local ok, name = pcall(vim.api.nvim_tabpage_get_var, tab, "tab_name")
-                  if not ok or name == "" then
-                    local win = vim.api.nvim_tabpage_get_win(tab)
-                    local buf = vim.api.nvim_win_get_buf(win)
-                    name = vim.fn.fnamemodify(vim.api.nvim_buf_get_name(buf), ":t")
-                    if name == "" then name = "[No Name]" end
-                  end
-                  local label = i .. ": " .. name
-                  table.insert(parts, label)
-                end
-                return table.concat(parts, " │ ")
+              "tabs",
+              mode = 1,
+              max_length = vim.o.columns,
+              tabs_color = {
+                active = "lualine_a_normal",
+                inactive = "lualine_b_normal",
+              },
+              section_separators = { left = "", right = "" },
+              component_separators = { left = "│", right = "│" },
+              fmt = function(name, context)
+                local ok, custom = pcall(vim.api.nvim_tabpage_get_var, context.tabId, "tab_name")
+                if ok and custom ~= "" then name = custom end
+                local tabnr = vim.api.nvim_tabpage_get_number(context.tabId)
+                return tabnr .. ": " .. name
               end,
-              padding = { left = 1, right = 1 },
             },
           },
         },
