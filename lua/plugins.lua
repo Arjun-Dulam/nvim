@@ -179,6 +179,27 @@ return {
         return cached_battery
       end
 
+      local mode_hl = {
+        n  = "lualine_a_normal",
+        i  = "lualine_a_insert",
+        v  = "lualine_a_visual",
+        V  = "lualine_a_visual",
+        ["\22"] = "lualine_a_visual",
+        c  = "lualine_a_command",
+        R  = "lualine_a_replace",
+        r  = "lualine_a_replace",
+        t  = "lualine_a_terminal",
+      }
+      local function active_tab_color()
+        return mode_hl[vim.fn.mode()] or "lualine_a_normal"
+      end
+
+      vim.api.nvim_create_autocmd("ModeChanged", {
+        callback = function()
+          require("lualine").refresh({ place = { "tabline" } })
+        end,
+      })
+
       require("lualine").setup({
         options = {
           icons_enabled = true,
@@ -205,7 +226,7 @@ return {
               mode = 1,
               max_length = vim.o.columns,
               tabs_color = {
-                active = "lualine_a_normal",
+                active = active_tab_color,
                 inactive = "lualine_b_normal",
               },
               section_separators = { left = "", right = "" },
@@ -242,6 +263,16 @@ return {
   -- nvim-lint: disabled — clangd LSP already provides real-time diagnostics
   -- { "mfussenegger/nvim-lint" },
 
+
+  -- vimtex: LaTeX compilation, Zathura integration, and SyncTeX
+  {
+    "lervag/vimtex",
+    ft = "tex",
+    init = function()
+      vim.g.vimtex_view_method = "skim"
+      vim.g.vimtex_compiler_method = "latexmk"
+    end,
+  },
 
   -- protobuf.vim: syntax highlighting and indent for protobuf/gRPC
   { "wfxr/protobuf.vim", ft = "proto" },

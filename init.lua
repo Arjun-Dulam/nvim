@@ -178,10 +178,10 @@ vim.keymap.set("n", "<leader>bp", ":bprevious<CR>", { desc = "Previous buffer" }
 -- Arrow keys with Ctrl resize the focused split by 2 lines/columns at a time.
 vim.keymap.set("n", "<leader>sv", ":vsplit<CR>",            { desc = "Split window vertically" })
 vim.keymap.set("n", "<leader>sh", ":split<CR>",             { desc = "Split window horizontally" })
-vim.keymap.set("n", "<C-Up>",    ":resize +2<CR>",          { desc = "Increase window height" })
-vim.keymap.set("n", "<C-Down>",  ":resize -2<CR>",          { desc = "Decrease window height" })
-vim.keymap.set("n", "<C-Left>",  ":vertical resize -2<CR>", { desc = "Decrease window width" })
-vim.keymap.set("n", "<C-Right>", ":vertical resize +2<CR>", { desc = "Increase window width" })
+vim.keymap.set("n", "<S-Up>",    ":resize +2<CR>",          { desc = "Increase window height" })
+vim.keymap.set("n", "<S-Down>",  ":resize -2<CR>",          { desc = "Decrease window height" })
+vim.keymap.set("n", "<S-Left>",  ":vertical resize -2<CR>", { desc = "Decrease window width" })
+vim.keymap.set("n", "<S-Right>", ":vertical resize +2<CR>", { desc = "Increase window width" })
 
 -- Option key text editing (macOS muscle memory)
 vim.keymap.set("i", "<M-BS>",    "<C-w>",          { desc = "Delete previous word" })
