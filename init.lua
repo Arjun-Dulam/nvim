@@ -281,34 +281,7 @@ end, { desc = "Reset tab name" })
 -- re-sourced, the old autocmds are wiped first so they don't pile up and fire multiple times.
 local augroup = vim.api.nvim_create_augroup("UserConfig", { clear = true })
 
--- Typst: compile on save + open PDF in WezTerm right split
-vim.api.nvim_create_autocmd("BufWritePost", {
-  group = augroup,
-  pattern = "*.typ",
-  callback = function()
-    vim.fn.jobstart({ "typst", "compile", vim.fn.expand("%:p") })
-  end,
-})
-
-vim.api.nvim_create_user_command("TypstPreview", function()
-  local file = vim.fn.expand("%:p")
-  local pdf  = vim.fn.expand("%:p:r") .. ".pdf"
-  local output = vim.fn.system({ "typst", "compile", file })
-  if vim.v.shell_error ~= 0 then
-    vim.notify(output, vim.log.levels.ERROR, { title = "Typst compile failed" })
-    return
-  end
-
-  vim.fn.jobstart({
-    "/opt/homebrew/bin/zathura",
-    "--plugins-dir", "/opt/homebrew/opt/zathura-pdf-mupdf",
-    pdf,
-  }, {
-    detach = true,
-  })
-end, {})
-
-vim.keymap.set("n", "<leader>tp", ":TypstPreview<CR>", { desc = "Compile Typst and open PDF" })
+vim.keymap.set("n", "<leader>tp", ":TypstPreviewToggle<CR>", { desc = "Toggle Typst preview" })
 
 vim.api.nvim_create_autocmd("FileType", {
   group = augroup,

@@ -22,7 +22,7 @@ return {
     dependencies = { "mason.nvim" },
     config = function()
       require("mason-lspconfig").setup({
-        ensure_installed = { "clangd", "protols" },
+        ensure_installed = { "clangd", "protols", "tinymist" },
       })
     end,
   },
@@ -35,9 +35,30 @@ return {
       local capabilities = require("cmp_nvim_lsp").default_capabilities()
       vim.lsp.config("clangd", { capabilities = capabilities })
       vim.lsp.config("protols", { capabilities = capabilities })
+      vim.lsp.config("tinymist", {
+        capabilities = capabilities,
+        settings = {
+          formatterMode = "typstyle",
+          exportPdf = "onType",
+          semanticTokens = "disable",
+        },
+      })
       vim.lsp.enable("clangd")
       vim.lsp.enable("protols")
+      vim.lsp.enable("tinymist")
     end,
+  },
+
+  -- Typst live preview via tinymist
+  {
+    "chomosuke/typst-preview.nvim",
+    ft = "typst",
+    version = "1.*",
+    opts = {
+      dependencies_bin = {
+        tinymist = "tinymist",
+      },
+    },
   },
 
   -- nvim-tree: file explorer sidebar
