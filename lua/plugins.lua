@@ -41,16 +41,176 @@ return {
     "folke/snacks.nvim",
     priority = 1000,
     lazy = false,
-    opts = {
-      input = { enabled = true },
-      notifier = {
-        enabled = true,
-        timeout = 3000,
-        style = "compact",
-      },
-      terminal = { enabled = true },
-    },
+    opts = function()
+      local function session_dir()
+        return vim.fn.stdpath("state") .. "/sessions"
+      end
+
+      local function session_file_to_dir(path)
+        local name = vim.fn.fnamemodify(path, ":t:r")
+        if name == "" or name == ".vim" then
+          return vim.fn.expand("~")
+        end
+        local decoded = name:gsub("%%", "/")
+        return decoded
+      end
+
+      local function session_items()
+        local dir = session_dir()
+        if vim.fn.isdirectory(dir) == 0 then
+          return {}
+        end
+
+        local files = vim.fn.globpath(dir, "*.vim", false, true)
+        table.sort(files, function(a, b)
+          return (vim.fn.getftime(a) or 0) > (vim.fn.getftime(b) or 0)
+        end)
+
+        local items = {}
+        for _, file in ipairs(files) do
+          local target = session_file_to_dir(file)
+          items[#items + 1] = {
+            text = vim.fn.fnamemodify(target, ":~"),
+            file = file,
+            session_dir = target,
+          }
+        end
+        return items
+      end
+
+      local function manage_sessions(cursor)
+        local items = session_items()
+        local target_cursor = math.max(1, math.min(cursor or 1, #items))
+
+        Snacks.picker({
+          title = "Saved Sessions",
+          items = items,
+          format = "text",
+          preview = "none",
+          focus = "list",
+          on_close = function()
+            vim.schedule(function()
+              pcall(Snacks.dashboard.update)
+            end)
+          end,
+          on_show = function(picker)
+            if #items > 0 then
+              picker.list:view(target_cursor, target_cursor)
+            end
+          end,
+          confirm = function(picker, item)
+            if not item then
+              return
+            end
+
+            picker:close()
+            vim.cmd("cd " .. vim.fn.fnameescape(item.session_dir))
+            require("persistence").load()
+          end,
+          actions = {
+            delete_session = function(picker, item)
+              item = item or picker:current()
+              if not item then
+                return
+              end
+
+              local next_cursor = picker.list.cursor
+
+              vim.fn.delete(item.file)
+              vim.notify(item.text, vim.log.levels.INFO, { title = "Deleted session" })
+              picker:close()
+              vim.schedule(function()
+                manage_sessions(next_cursor)
+              end)
+            end,
+          },
+          win = {
+            input = {
+              keys = {
+                ["<Del>"] = { "delete_session", mode = { "n", "i" }, desc = "Delete Session" },
+                ["<C-d>"] = { "delete_session", mode = { "n", "i" }, desc = "Delete Session" },
+              },
+            },
+            list = {
+              keys = {
+                ["d"] = "delete_session",
+                ["x"] = "delete_session",
+                ["<Del>"] = "delete_session",
+              },
+            },
+          },
+        })
+      end
+
+      return {
+        dashboard = {
+          enabled = true,
+          preset = {
+            keys = {
+              { icon = " ", key = "f", desc = "Find File", action = "<leader>ff" },
+              { icon = " ", key = "r", desc = "Recent Files", action = ":lua Snacks.dashboard.pick('oldfiles')" },
+              { icon = " ", key = "s", desc = "Manage Sessions", action = manage_sessions },
+              { icon = " ", key = "t", desc = "Terminal", action = "<leader>tt" },
+              { icon = " ", key = "q", desc = "Quit", action = ":qa" },
+            },
+          },
+          sections = {
+            { section = "header" },
+            { section = "keys", gap = 1, padding = 1 },
+            function()
+              local items = session_items()
+              local dashboard_items = {
+                {
+                  pane = 2,
+                  icon = " ",
+                  title = "Saved Sessions",
+                  padding = 1,
+                },
+              }
+
+              for _, item in ipairs(items) do
+                dashboard_items[#dashboard_items + 1] = {
+                  pane = 2,
+                  icon = " ",
+                  desc = item.text,
+                  indent = 2,
+                  action = function()
+                    vim.cmd("cd " .. vim.fn.fnameescape(item.session_dir))
+                    require("persistence").load()
+                  end,
+                }
+              end
+
+              return dashboard_items
+            end,
+            { section = "startup" },
+          },
+        },
+        input = { enabled = true },
+        notifier = {
+          enabled = true,
+          timeout = 3000,
+          style = "compact",
+        },
+        picker = { enabled = true },
+        terminal = { enabled = true },
+      }
+    end,
     keys = {
+      {
+        "<leader>qs",
+        function()
+          Snacks.picker.resume({ source = "files" })
+        end,
+        enabled = false,
+      },
+      {
+        "<leader>qm",
+        function()
+          manage_sessions()
+        end,
+        desc = "Manage saved sessions",
+      },
       {
         "<leader>tt",
         function()
