@@ -61,6 +61,16 @@ return {
         return decoded
       end
 
+      local function session_project(dir)
+        local git_dir = vim.fs.find(".git", { path = dir, upward = true, type = "directory" })[1]
+        local root = git_dir and vim.fn.fnamemodify(git_dir, ":h") or dir
+        return {
+          root = root,
+          name = vim.fn.fnamemodify(root, ":t"),
+          path = vim.fn.fnamemodify(dir, ":~"),
+        }
+      end
+
       local function session_items()
         local dir = session_dir()
         if vim.fn.isdirectory(dir) == 0 then
@@ -73,30 +83,41 @@ return {
         end)
 
         local items = {}
+        local seen = {}
         for _, file in ipairs(files) do
           local target = session_file_to_dir(file)
-          items[#items + 1] = {
-            text = vim.fn.fnamemodify(target, ":~"),
-            file = file,
-            session_dir = target,
-          }
+          if vim.fn.isdirectory(target) == 1 and not seen[target] then
+            seen[target] = true
+            local project = session_project(target)
+            items[#items + 1] = {
+              text = string.format("%s  %s", project.name, project.path),
+              title = project.name,
+              path = project.path,
+              file = file,
+              session_dir = target,
+            }
+          end
         end
         return items
       end
 
       local function current_dir_section()
         local cwd = vim.fn.getcwd()
-        local name = vim.fn.fnamemodify(cwd, ":t")
-        local short = vim.fn.fnamemodify(cwd, ":~")
+        local project = session_project(cwd)
 
         return {
-          pane = 1,
-          padding = 1,
-          text = {
-            { "  ", hl = "Directory" },
-            { name, hl = "Title" },
-            { "  in  ", hl = "Comment" },
-            { short, hl = "Directory" },
+          {
+            pane = 1,
+            padding = 1,
+            icon = " ",
+            title = project.name,
+            indent = 2,
+          },
+          {
+            pane = 1,
+            desc = project.path,
+            indent = 4,
+            padding = 1,
           },
         }
       end
@@ -197,7 +218,7 @@ return {
                 dashboard_items[#dashboard_items + 1] = {
                   pane = 2,
                   icon = " ",
-                  desc = item.text,
+                  desc = item.path,
                   indent = 2,
                   action = function()
                     vim.cmd("cd " .. vim.fn.fnameescape(item.session_dir))
@@ -234,6 +255,15 @@ return {
             return dir_name:gsub("%%", "/"):gsub("/+", "/")
           end
 
+          local function session_project(dir)
+            local git_dir = vim.fs.find(".git", { path = dir, upward = true, type = "directory" })[1]
+            local root = git_dir and vim.fn.fnamemodify(git_dir, ":h") or dir
+            return {
+              name = vim.fn.fnamemodify(root, ":t"),
+              path = vim.fn.fnamemodify(dir, ":~"),
+            }
+          end
+
           local function session_items()
             local dir = vim.fn.stdpath("state") .. "/sessions"
             if vim.fn.isdirectory(dir) == 0 then
@@ -246,13 +276,18 @@ return {
             end)
 
             local items = {}
+            local seen = {}
             for _, file in ipairs(files) do
               local target = session_file_to_dir(file)
-              items[#items + 1] = {
-                text = vim.fn.fnamemodify(target, ":~"),
-                file = file,
-                session_dir = target,
-              }
+              if vim.fn.isdirectory(target) == 1 and not seen[target] then
+                seen[target] = true
+                local project = session_project(target)
+                items[#items + 1] = {
+                  text = string.format("%s  %s", project.name, project.path),
+                  file = file,
+                  session_dir = target,
+                }
+              end
             end
             return items
           end
