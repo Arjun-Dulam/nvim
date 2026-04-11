@@ -54,9 +54,15 @@ return {
       {
         "<leader>tt",
         function()
-          Snacks.terminal.toggle(nil, { cwd = vim.fn.getcwd() })
+          Snacks.terminal.toggle(nil, {
+            cwd = vim.fn.getcwd(),
+            win = {
+              position = "right",
+              width = 0.4,
+            },
+          })
         end,
-        desc = "Toggle terminal in bottom split",
+        desc = "Toggle terminal in vertical split",
       },
       {
         "<leader>tf",
