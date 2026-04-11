@@ -72,6 +72,7 @@ return {
       { "<leader>fg", ":Telescope live_grep<CR>", desc = "Live grep" },
       { "<leader>fb", ":Telescope buffers<CR>", desc = "Find buffers" },
       { "<leader>fh", ":Telescope help_tags<CR>", desc = "Help tags" },
+      { "<leader>fi", ":Telescope current_buffer_fuzzy_find<CR>", desc = "Find instances" },
     },
   },
 
@@ -316,6 +317,7 @@ return {
       { "<leader>ms", ":Markview splitToggle<CR>", desc = "Toggle markdown splitview" },
     },
   },
+
 
   -- persistence.nvim: auto-save and restore sessions per directory
   {
