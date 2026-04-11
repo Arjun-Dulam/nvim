@@ -169,15 +169,15 @@ vim.keymap.set("n", "<C-u>", "<C-u>zz", { desc = "Half page up (centered)" })
 -- Buffer navigation
 -- Buffers are open files in memory. You can have many files open at once and switch between them.
 -- bn = buffer next, bp = buffer previous. Like browser tab switching but for files.
-vim.keymap.set("n", "<leader>bn", ":bnext<CR>",     { desc = "Next buffer" })
-vim.keymap.set("n", "<leader>bp", ":bprevious<CR>", { desc = "Previous buffer" })
+vim.keymap.set("n", "<leader>bn", ":bnext<CR>",     { desc = "Go to next buffer" })
+vim.keymap.set("n", "<leader>bp", ":bprevious<CR>", { desc = "Go to previous buffer" })
 
 -- Splitting & Resizing
 -- Splits let you view multiple files (or different parts of the same file) side by side.
 -- sv = split vertical (two windows side by side), sh = split horizontal (stacked top/bottom).
 -- Arrow keys with Ctrl resize the focused split by 2 lines/columns at a time.
-vim.keymap.set("n", "<leader>sv", ":vsplit<CR>",            { desc = "Split window vertically" })
-vim.keymap.set("n", "<leader>sh", ":split<CR>",             { desc = "Split window horizontally" })
+vim.keymap.set("n", "<leader>sv", ":vsplit<CR>",            { desc = "Open vertical split" })
+vim.keymap.set("n", "<leader>sh", ":split<CR>",             { desc = "Open horizontal split" })
 vim.keymap.set("n", "<S-Up>",    ":resize +2<CR>",          { desc = "Increase window height" })
 vim.keymap.set("n", "<S-Down>",  ":resize -2<CR>",          { desc = "Decrease window height" })
 vim.keymap.set("n", "<S-Left>",  ":vertical resize -2<CR>", { desc = "Decrease window width" })
@@ -236,19 +236,19 @@ vim.keymap.set("n", "<leader>pa", function()
 end, { desc = "Copy file directory" })
 
 -- Quick config editing — jump straight to init.lua from anywhere
-vim.keymap.set("n", "<leader>rc", ":e ~/.config/nvim/init.lua<CR>", { desc = "Edit config" })
+vim.keymap.set("n", "<leader>rc", ":e ~/.config/nvim/init.lua<CR>", { desc = "Open Neovim config" })
 
 vim.keymap.set("n", "<leader>pf", function()
   local path = vim.fn.expand("%:p")
   vim.fn.setreg("+", path)
   print("full path:", path)
-end, { desc = "Copy full file path" })
+end, { desc = "Copy absolute file path" })
 
 vim.keymap.set("n", "<leader>pr", function()
   local path = vim.fn.expand("%")
   vim.fn.setreg("+", path)
   print("relative path:", path)
-end, { desc = "Copy relative file path" })
+end, { desc = "Copy path relative to cwd" })
 
 -- Rename current file
 -- Prompts for a new name, saves the file under that name, then deletes the old file.
@@ -261,27 +261,27 @@ vim.keymap.set("n", "<leader>rr", function()
     vim.fn.delete(old)
     print("Renamed to: " .. new)
   end
-end, { desc = "Rename current file" })
+end, { desc = "Rename current file on disk" })
 
 -- Tabs
 -- Tabs in Neovim are window layouts — each tab can have its own split arrangement.
 -- gt / gT (built-in) switch between tabs. tn = new tab, tx = close current tab.
-vim.keymap.set("n", "<leader>tn", ":tabnew<CR>",   { desc = "New tab" })
-vim.keymap.set("n", "<leader>tx", ":tabclose<CR>", { desc = "Close tab" })
+vim.keymap.set("n", "<leader>tn", ":tabnew<CR>",   { desc = "Open new tab" })
+vim.keymap.set("n", "<leader>tx", ":tabclose<CR>", { desc = "Close current tab" })
 vim.keymap.set("n", "<leader>tr", function()
   local name = vim.fn.input("Tab name: ")
   if name ~= "" then vim.api.nvim_tabpage_set_var(0, "tab_name", name) end
-end, { desc = "Rename tab" })
+end, { desc = "Set custom tab name" })
 vim.keymap.set("n", "<leader>tR", function()
   vim.api.nvim_tabpage_set_var(0, "tab_name", "")
-end, { desc = "Reset tab name" })
+end, { desc = "Clear custom tab name" })
 
 -- Autocmd group
 -- An augroup is a named container for autocmds. Using { clear = true } means if this file is
 -- re-sourced, the old autocmds are wiped first so they don't pile up and fire multiple times.
 local augroup = vim.api.nvim_create_augroup("UserConfig", { clear = true })
 
-vim.keymap.set("n", "<leader>tp", ":TypstPreviewToggle<CR>", { desc = "Toggle Typst preview" })
+vim.keymap.set("n", "<leader>tp", ":TypstPreviewToggle<CR>", { desc = "Toggle Typst live preview" })
 
 vim.api.nvim_create_autocmd("FileType", {
   group = augroup,
@@ -370,11 +370,11 @@ local function setup_lsp()
   --   gD: jump to where it's declared (different from definition in some languages like C)
   --   K: show hover documentation popup for whatever's under the cursor
   --   gi: go to implementation (e.g. the concrete class that implements an interface)
-  --   <leader>D: go to the type definition of a variable
-  --   <leader>rn: rename symbol everywhere it's used across the codebase
-  --   <leader>ca: show code actions (quick fixes, import suggestions, etc.)
+  --   <leader>ld: go to the type definition of a variable
+  --   <leader>lr: rename symbol everywhere it's used across the codebase
+  --   <leader>la: show code actions (quick fixes, import suggestions, etc.)
   --   gr: show all references to the symbol under the cursor
-  --   <leader>f: format the entire file using the language server's formatter
+  --   <leader>lf: format the entire file using the language server's formatter
   vim.api.nvim_create_autocmd("LspAttach", {
     group = augroup,
     callback = function(ev)
@@ -383,13 +383,13 @@ local function setup_lsp()
       vim.keymap.set("n", "gd", vim.lsp.buf.definition, opts)
       vim.keymap.set("n", "K",  vim.lsp.buf.hover, opts)
       vim.keymap.set("n", "gi", vim.lsp.buf.implementation, opts)
-      vim.keymap.set("n", "<leader>D",  vim.lsp.buf.type_definition, opts)
-      vim.keymap.set("n", "<leader>rn", vim.lsp.buf.rename, opts)
-      vim.keymap.set("n", "<leader>ca", vim.lsp.buf.code_action, opts)
+      vim.keymap.set("n", "<leader>ld", vim.lsp.buf.type_definition, vim.tbl_extend("force", opts, { desc = "Go to symbol type definition" }))
+      vim.keymap.set("n", "<leader>lr", vim.lsp.buf.rename, vim.tbl_extend("force", opts, { desc = "Rename symbol across project" }))
+      vim.keymap.set("n", "<leader>la", vim.lsp.buf.code_action, vim.tbl_extend("force", opts, { desc = "Show available code actions" }))
       vim.keymap.set("n", "gr", vim.lsp.buf.references, opts)
-      vim.keymap.set("n", "<leader>f", function()
+      vim.keymap.set("n", "<leader>lf", function()
         vim.lsp.buf.format { async = true }
-      end, opts)
+      end, vim.tbl_extend("force", opts, { desc = "Format current buffer with LSP" }))
     end,
   })
 
@@ -404,11 +404,11 @@ end
 
 -- Diagnostic navigation — available in all buffers, not just ones with LSP
 -- pd/nd: jump to the previous/next diagnostic (error or warning) in the file
--- <leader>q: dump all diagnostics into the location list (a scrollable panel)
+-- <leader>dq: dump all diagnostics into the location list (a scrollable panel)
 -- <leader>dl: open a floating popup showing the full diagnostic message for the current line
 vim.keymap.set("n", "pd", vim.diagnostic.goto_prev, { desc = "Previous diagnostic" })
 vim.keymap.set("n", "nd", vim.diagnostic.goto_next, { desc = "Next diagnostic" })
-vim.keymap.set("n", "<leader>q",  vim.diagnostic.setloclist,  { desc = "Open diagnostic list" })
-vim.keymap.set("n", "<leader>dl", vim.diagnostic.open_float,  { desc = "Show line diagnostics" })
+vim.keymap.set("n", "<leader>dq", vim.diagnostic.setloclist,  { desc = "Open all file diagnostics in location list" })
+vim.keymap.set("n", "<leader>dl", vim.diagnostic.open_float,  { desc = "Show diagnostics for current line" })
 
 setup_lsp()

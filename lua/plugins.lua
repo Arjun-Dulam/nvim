@@ -6,6 +6,21 @@ return {
     config = function()
       require("which-key").setup({
         preset = "modern",
+        sort = { "manual" },
+        spec = {
+          { "<leader>e", desc = "Toggle file explorer sidebar" },
+          { "<leader>f", group = "Find and Search" },
+          { "<leader>b", group = "Buffer Navigation" },
+          { "<leader>s", group = "Window Layouts" },
+          { "<leader>t", group = "Tab Management and Typst" },
+          { "<leader>p", group = "Copy File Paths" },
+          { "<leader>r", group = "Rename Files and Edit Config" },
+          { "<leader>l", group = "Language Server Actions" },
+          { "<leader>g", group = "Git Change Actions" },
+          { "<leader>d", group = "Diagnostics" },
+          { "<leader>m", group = "Markdown Preview" },
+          { "<leader>q", group = "Session Management" },
+        },
         win = {
           border = "rounded",
           padding = { 1, 2 },
@@ -85,7 +100,7 @@ return {
       })
     end,
     keys = {
-      { "<leader>e", ":NvimTreeToggle<CR>", desc = "Toggle file explorer" },
+      { "<leader>e", ":NvimTreeToggle<CR>", desc = "Toggle file explorer sidebar" },
     },
   },
 
@@ -102,11 +117,11 @@ return {
       telescope.load_extension("fzf")
     end,
     keys = {
-      { "<leader>ff", ":Telescope find_files<CR>", desc = "Find files" },
-      { "<leader>fg", ":Telescope live_grep<CR>", desc = "Live grep" },
-      { "<leader>fb", ":Telescope buffers<CR>", desc = "Find buffers" },
-      { "<leader>fh", ":Telescope help_tags<CR>", desc = "Help tags" },
-      { "<leader>fi", ":Telescope current_buffer_fuzzy_find<CR>", desc = "Find instances" },
+      { "<leader>ff", ":Telescope find_files<CR>", desc = "Find files in project" },
+      { "<leader>fg", ":Telescope live_grep<CR>", desc = "Search text across project" },
+      { "<leader>fb", ":Telescope buffers<CR>", desc = "Find among open buffers" },
+      { "<leader>fh", ":Telescope help_tags<CR>", desc = "Search Neovim help" },
+      { "<leader>fi", ":Telescope current_buffer_fuzzy_find<CR>", desc = "Search text in current buffer" },
     },
   },
 
@@ -132,9 +147,9 @@ return {
       })
     end,
     keys = {
-      { "<leader>gb", ":Gitsigns blame_line<CR>", desc = "Git blame" },
-      { "<leader>gd", ":Gitsigns diffthis<CR>", desc = "Git diff" },
-      { "<leader>gh", ":Gitsigns preview_hunk<CR>", desc = "Git preview hunk" },
+      { "<leader>gb", ":Gitsigns blame_line<CR>", desc = "Show blame for current line" },
+      { "<leader>gd", ":Gitsigns diffthis<CR>", desc = "Diff current buffer" },
+      { "<leader>gh", ":Gitsigns preview_hunk<CR>", desc = "Preview current git hunk" },
     },
   },
 
@@ -175,7 +190,7 @@ return {
       end, {})
     end,
     keys = {
-      { "<leader>fa", "<cmd>Format<CR>", desc = "Format buffer" },
+      { "<leader>fa", "<cmd>Format<CR>", desc = "Format current buffer with Conform" },
     },
   },
 
@@ -347,8 +362,8 @@ return {
       require("markview").setup()
     end,
     keys = {
-      { "<leader>mp", ":Markview toggle<CR>",      desc = "Toggle markdown preview" },
-      { "<leader>ms", ":Markview splitToggle<CR>", desc = "Toggle markdown splitview" },
+      { "<leader>mp", ":Markview toggle<CR>",      desc = "Toggle Markdown rendering" },
+      { "<leader>ms", ":Markview splitToggle<CR>", desc = "Toggle Markdown split preview" },
     },
   },
 
@@ -361,9 +376,9 @@ return {
       require("persistence").setup()
     end,
     keys = {
-      { "<leader>qs", function() require("persistence").load() end, desc = "Restore session" },
+      { "<leader>qs", function() require("persistence").load() end, desc = "Restore session for cwd" },
       { "<leader>ql", function() require("persistence").load({ last = true }) end, desc = "Restore last session" },
-      { "<leader>qd", function() require("persistence").stop() end, desc = "Stop persistence" },
+      { "<leader>qd", function() require("persistence").stop() end, desc = "Stop saving this session" },
     },
   },
 
