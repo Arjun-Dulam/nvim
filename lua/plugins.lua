@@ -15,6 +15,7 @@ return {
           { "<leader>t", group = "Tabs, Terminal, and Typst" },
           { "<leader>p", group = "Copy File Paths" },
           { "<leader>r", group = "Rename Files and Edit Config" },
+          { "<leader>c", group = "Code Actions" },
           { "<leader>l", group = "Language Server Actions" },
           { "<leader>g", group = "Git Change Actions" },
           { "<leader>d", group = "Diagnostics" },
@@ -215,13 +216,6 @@ return {
       }
     end,
     keys = {
-      {
-        "<leader>qs",
-        function()
-          Snacks.picker.resume({ source = "files" })
-        end,
-        enabled = false,
-      },
       {
         "<leader>qm",
         function()
@@ -592,8 +586,7 @@ return {
       require("persistence").setup()
     end,
     keys = {
-      { "<leader>qs", function() require("persistence").load() end, desc = "Restore session for cwd" },
-      { "<leader>ql", function() require("persistence").load({ last = true }) end, desc = "Restore last session" },
+      { "<leader>qr", function() require("persistence").load() end, desc = "Restore session for current directory" },
       { "<leader>qd", function() require("persistence").stop() end, desc = "Stop saving this session" },
     },
   },
