@@ -78,6 +78,23 @@ return {
         return items
       end
 
+      local function current_dir_section()
+        local cwd = vim.fn.getcwd()
+        local name = vim.fn.fnamemodify(cwd, ":t")
+        local short = vim.fn.fnamemodify(cwd, ":~")
+
+        return {
+          pane = 1,
+          padding = 1,
+          text = {
+            { "  ", hl = "Directory" },
+            { name, hl = "Title" },
+            { "  in  ", hl = "Comment" },
+            { short, hl = "Directory" },
+          },
+        }
+      end
+
       local function manage_sessions(cursor)
         local items = session_items()
         local target_cursor = math.max(1, math.min(cursor or 1, #items))
@@ -156,6 +173,7 @@ return {
           },
           sections = {
             { section = "header" },
+            current_dir_section,
             { section = "keys", gap = 1, padding = 1 },
             function()
               local items = session_items()
