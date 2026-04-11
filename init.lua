@@ -176,8 +176,8 @@ vim.keymap.set("n", "<leader>bp", ":bprevious<CR>", { desc = "Go to previous buf
 -- Splits let you view multiple files (or different parts of the same file) side by side.
 -- sv = split vertical (two windows side by side), sh = split horizontal (stacked top/bottom).
 -- Arrow keys with Ctrl resize the focused split by 2 lines/columns at a time.
-vim.keymap.set("n", "<leader>sv", ":vsplit<CR>",            { desc = "Open vertical split" })
-vim.keymap.set("n", "<leader>sh", ":split<CR>",             { desc = "Open horizontal split" })
+vim.keymap.set("n", "<leader>sv", ":vsplit<CR>",            { desc = "Vertical split" })
+vim.keymap.set("n", "<leader>sh", ":split<CR>",             { desc = "Horizontal split" })
 vim.keymap.set("n", "<S-Up>",    ":resize +2<CR>",          { desc = "Increase window height" })
 vim.keymap.set("n", "<S-Down>",  ":resize -2<CR>",          { desc = "Decrease window height" })
 vim.keymap.set("n", "<S-Left>",  ":vertical resize -2<CR>", { desc = "Decrease window width" })
@@ -232,7 +232,7 @@ vim.keymap.set("v", ">", ">gv", { desc = "Indent right and reselect" })
 vim.keymap.set("n", "<leader>pa", function()
     local path = vim.fn.expand("%:p:h")
     vim.fn.setreg("+", path)
-    print("dir:", path)
+    vim.notify(path, vim.log.levels.INFO, { title = "Copied file directory" })
 end, { desc = "Copy file directory" })
 
 -- Quick config editing — jump straight to init.lua from anywhere
@@ -241,13 +241,13 @@ vim.keymap.set("n", "<leader>rc", ":e ~/.config/nvim/init.lua<CR>", { desc = "Op
 vim.keymap.set("n", "<leader>pf", function()
   local path = vim.fn.expand("%:p")
   vim.fn.setreg("+", path)
-  print("full path:", path)
+  vim.notify(path, vim.log.levels.INFO, { title = "Copied absolute file path" })
 end, { desc = "Copy absolute file path" })
 
 vim.keymap.set("n", "<leader>pr", function()
   local path = vim.fn.expand("%")
   vim.fn.setreg("+", path)
-  print("relative path:", path)
+  vim.notify(path, vim.log.levels.INFO, { title = "Copied path relative to cwd" })
 end, { desc = "Copy path relative to cwd" })
 
 -- Rename current file
@@ -255,12 +255,15 @@ end, { desc = "Copy path relative to cwd" })
 -- Uses the current filename as the default so you can just edit it rather than retype.
 vim.keymap.set("n", "<leader>rr", function()
   local old = vim.fn.expand("%")
-  local new = vim.fn.input("New file name: ", old)
-  if new ~= "" and new ~= old then
-    vim.cmd("saveas " .. new)
+  vim.ui.input({ prompt = "New file name: ", default = old }, function(new)
+    if not new or new == "" or new == old then
+      return
+    end
+
+    vim.cmd("saveas " .. vim.fn.fnameescape(new))
     vim.fn.delete(old)
-    print("Renamed to: " .. new)
-  end
+    vim.notify(new, vim.log.levels.INFO, { title = "Renamed current file" })
+  end)
 end, { desc = "Rename current file on disk" })
 
 -- Tabs
@@ -269,11 +272,17 @@ end, { desc = "Rename current file on disk" })
 vim.keymap.set("n", "<leader>tn", ":tabnew<CR>",   { desc = "Open new tab" })
 vim.keymap.set("n", "<leader>tx", ":tabclose<CR>", { desc = "Close current tab" })
 vim.keymap.set("n", "<leader>tr", function()
-  local name = vim.fn.input("Tab name: ")
-  if name ~= "" then vim.api.nvim_tabpage_set_var(0, "tab_name", name) end
+  vim.ui.input({ prompt = "Tab name: " }, function(name)
+    if not name or name == "" then
+      return
+    end
+    vim.api.nvim_tabpage_set_var(0, "tab_name", name)
+    vim.notify(name, vim.log.levels.INFO, { title = "Set custom tab name" })
+  end)
 end, { desc = "Set custom tab name" })
 vim.keymap.set("n", "<leader>tR", function()
   vim.api.nvim_tabpage_set_var(0, "tab_name", "")
+  vim.notify("Custom tab name cleared", vim.log.levels.INFO, { title = "Tab name reset" })
 end, { desc = "Clear custom tab name" })
 
 -- Autocmd group
@@ -281,7 +290,7 @@ end, { desc = "Clear custom tab name" })
 -- re-sourced, the old autocmds are wiped first so they don't pile up and fire multiple times.
 local augroup = vim.api.nvim_create_augroup("UserConfig", { clear = true })
 
-vim.keymap.set("n", "<leader>tp", ":TypstPreviewToggle<CR>", { desc = "Toggle Typst live preview" })
+vim.keymap.set("n", "<leader>tp", ":TypstPreviewToggle<CR>", { desc = "Typst live preview" })
 
 vim.api.nvim_create_autocmd("FileType", {
   group = augroup,

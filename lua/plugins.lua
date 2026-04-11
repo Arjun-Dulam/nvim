@@ -12,7 +12,7 @@ return {
           { "<leader>f", group = "Find and Search" },
           { "<leader>b", group = "Buffer Navigation" },
           { "<leader>s", group = "Window Layouts" },
-          { "<leader>t", group = "Tab Management and Typst" },
+          { "<leader>t", group = "Tabs, Terminal, and Typst" },
           { "<leader>p", group = "Copy File Paths" },
           { "<leader>r", group = "Rename Files and Edit Config" },
           { "<leader>l", group = "Language Server Actions" },
@@ -34,6 +34,38 @@ return {
         },
       })
     end,
+  },
+
+  -- snacks.nvim: notifier, input UI, and terminal management
+  {
+    "folke/snacks.nvim",
+    priority = 1000,
+    lazy = false,
+    opts = {
+      input = { enabled = true },
+      notifier = {
+        enabled = true,
+        timeout = 3000,
+        style = "compact",
+      },
+      terminal = { enabled = true },
+    },
+    keys = {
+      {
+        "<leader>tt",
+        function()
+          Snacks.terminal.toggle(nil, { cwd = vim.fn.getcwd() })
+        end,
+        desc = "Toggle terminal in bottom split",
+      },
+      {
+        "<leader>tf",
+        function()
+          Snacks.terminal.toggle(vim.o.shell, { cwd = vim.fn.getcwd() })
+        end,
+        desc = "Toggle floating terminal",
+      },
+    },
   },
 
   -- Mason: package manager for language servers, linters, formatters
