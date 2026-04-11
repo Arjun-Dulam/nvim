@@ -52,7 +52,12 @@ return {
         if name == "" or name == ".vim" then
           return vim.fn.expand("~")
         end
-        local decoded = name:gsub("%%", "/")
+
+        -- persistence.nvim appends git branches as "%%branch" to the
+        -- encoded cwd. Strip that suffix before decoding the path.
+        local dir_name = name:match("^(.*)%%%%[^%%]+$") or name
+        local decoded = dir_name:gsub("%%", "/")
+        decoded = decoded:gsub("/+", "/")
         return decoded
       end
 
@@ -98,7 +103,8 @@ return {
 
       local function manage_sessions(cursor)
         local items = session_items()
-        local target_cursor = math.max(1, math.min(cursor or 1, #items))
+        local requested_cursor = type(cursor) == "number" and cursor or 1
+        local target_cursor = #items > 0 and math.max(1, math.min(requested_cursor, #items)) or 1
 
         Snacks.picker({
           title = "Saved Sessions",
@@ -132,7 +138,7 @@ return {
                 return
               end
 
-              local next_cursor = picker.list.cursor
+              local next_cursor = type(picker.list.cursor) == "number" and picker.list.cursor or target_cursor
 
               vim.fn.delete(item.file)
               vim.notify(item.text, vim.log.levels.INFO, { title = "Deleted session" })
@@ -219,7 +225,102 @@ return {
       {
         "<leader>qm",
         function()
-          manage_sessions()
+          local function session_file_to_dir(path)
+            local name = vim.fn.fnamemodify(path, ":t:r")
+            if name == "" or name == ".vim" then
+              return vim.fn.expand("~")
+            end
+            local dir_name = name:match("^(.*)%%%%[^%%]+$") or name
+            return dir_name:gsub("%%", "/"):gsub("/+", "/")
+          end
+
+          local function session_items()
+            local dir = vim.fn.stdpath("state") .. "/sessions"
+            if vim.fn.isdirectory(dir) == 0 then
+              return {}
+            end
+
+            local files = vim.fn.globpath(dir, "*.vim", false, true)
+            table.sort(files, function(a, b)
+              return (vim.fn.getftime(a) or 0) > (vim.fn.getftime(b) or 0)
+            end)
+
+            local items = {}
+            for _, file in ipairs(files) do
+              local target = session_file_to_dir(file)
+              items[#items + 1] = {
+                text = vim.fn.fnamemodify(target, ":~"),
+                file = file,
+                session_dir = target,
+              }
+            end
+            return items
+          end
+
+          local function open_manager(cursor)
+            local items = session_items()
+            local requested_cursor = type(cursor) == "number" and cursor or 1
+            local target_cursor = #items > 0 and math.max(1, math.min(requested_cursor, #items)) or 1
+
+            Snacks.picker({
+              title = "Saved Sessions",
+              items = items,
+              format = "text",
+              preview = "none",
+              focus = "list",
+              on_close = function()
+                vim.schedule(function()
+                  pcall(Snacks.dashboard.update)
+                end)
+              end,
+              on_show = function(picker)
+                if #items > 0 then
+                  picker.list:view(target_cursor, target_cursor)
+                end
+              end,
+              confirm = function(picker, item)
+                if not item then
+                  return
+                end
+                picker:close()
+                vim.cmd("cd " .. vim.fn.fnameescape(item.session_dir))
+                require("persistence").load()
+              end,
+              actions = {
+                delete_session = function(picker, item)
+                  item = item or picker:current()
+                  if not item then
+                    return
+                  end
+
+                  local next_cursor = type(picker.list.cursor) == "number" and picker.list.cursor or target_cursor
+                  vim.fn.delete(item.file)
+                  vim.notify(item.text, vim.log.levels.INFO, { title = "Deleted session" })
+                  picker:close()
+                  vim.schedule(function()
+                    open_manager(next_cursor)
+                  end)
+                end,
+              },
+              win = {
+                input = {
+                  keys = {
+                    ["<Del>"] = { "delete_session", mode = { "n", "i" }, desc = "Delete Session" },
+                    ["<C-d>"] = { "delete_session", mode = { "n", "i" }, desc = "Delete Session" },
+                  },
+                },
+                list = {
+                  keys = {
+                    ["d"] = "delete_session",
+                    ["x"] = "delete_session",
+                    ["<Del>"] = "delete_session",
+                  },
+                },
+              },
+            })
+          end
+
+          open_manager()
         end,
         desc = "Manage saved sessions",
       },
