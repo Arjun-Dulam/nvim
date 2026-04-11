@@ -4,7 +4,20 @@ return {
     "folke/which-key.nvim",
     event = "VeryLazy",
     config = function()
-      require("which-key").setup()
+      require("which-key").setup({
+        preset = "modern",
+        win = {
+          border = "rounded",
+          padding = { 1, 2 },
+        },
+        layout = {
+          spacing = 3,
+          width = { min = 24 },
+        },
+        icons = {
+          mappings = false,
+        },
+      })
     end,
   },
 
