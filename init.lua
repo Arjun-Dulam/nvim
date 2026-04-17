@@ -388,17 +388,17 @@ local function setup_lsp()
     group = augroup,
     callback = function(ev)
       local opts = { buffer = ev.buf }
-      vim.keymap.set("n", "gD", vim.lsp.buf.declaration, opts)
-      vim.keymap.set("n", "gd", vim.lsp.buf.definition, opts)
-      vim.keymap.set("n", "K",  vim.lsp.buf.hover, opts)
-      vim.keymap.set("n", "gi", vim.lsp.buf.implementation, opts)
+      vim.keymap.set("n", "gD", vim.lsp.buf.declaration,     vim.tbl_extend("force", opts, { desc = "Go to declaration" }))
+      vim.keymap.set("n", "gd", vim.lsp.buf.definition,      vim.tbl_extend("force", opts, { desc = "Go to definition" }))
+      vim.keymap.set("n", "K",  vim.lsp.buf.hover,           opts)
+      vim.keymap.set("n", "gi", vim.lsp.buf.implementation,  vim.tbl_extend("force", opts, { desc = "Go to implementation" }))
       vim.keymap.set("n", "<leader>ld", vim.lsp.buf.type_definition, vim.tbl_extend("force", opts, { desc = "Go to symbol type definition" }))
       vim.keymap.set("n", "<leader>D", vim.lsp.buf.type_definition, vim.tbl_extend("force", opts, { desc = "Go to symbol type definition" }))
       vim.keymap.set("n", "<leader>lr", vim.lsp.buf.rename, vim.tbl_extend("force", opts, { desc = "Rename symbol across project" }))
       vim.keymap.set("n", "<leader>rn", vim.lsp.buf.rename, vim.tbl_extend("force", opts, { desc = "Rename symbol across project" }))
       vim.keymap.set("n", "<leader>la", vim.lsp.buf.code_action, vim.tbl_extend("force", opts, { desc = "Show available code actions" }))
       vim.keymap.set("n", "<leader>ca", vim.lsp.buf.code_action, vim.tbl_extend("force", opts, { desc = "Show available code actions" }))
-      vim.keymap.set("n", "gr", vim.lsp.buf.references, opts)
+      vim.keymap.set("n", "gr", vim.lsp.buf.references,      vim.tbl_extend("force", opts, { desc = "Show all references" }))
       vim.keymap.set("n", "<leader>lf", function()
         vim.lsp.buf.format { async = true }
       end, vim.tbl_extend("force", opts, { desc = "Format current buffer with LSP" }))
@@ -415,11 +415,11 @@ local function setup_lsp()
 end
 
 -- Diagnostic navigation — available in all buffers, not just ones with LSP
--- pd/nd: jump to the previous/next diagnostic (error or warning) in the file
+-- <leader>dp/dn: jump to the previous/next diagnostic (error or warning) in the file
 -- <leader>dq: dump all diagnostics into the location list (a scrollable panel)
 -- <leader>dl: open a floating popup showing the full diagnostic message for the current line
-vim.keymap.set("n", "pd", vim.diagnostic.goto_prev, { desc = "Previous diagnostic" })
-vim.keymap.set("n", "nd", vim.diagnostic.goto_next, { desc = "Next diagnostic" })
+vim.keymap.set("n", "<leader>dp", vim.diagnostic.goto_prev, { desc = "Previous diagnostic" })
+vim.keymap.set("n", "<leader>dn", vim.diagnostic.goto_next, { desc = "Next diagnostic" })
 vim.keymap.set("n", "<leader>dq", vim.diagnostic.setloclist,  { desc = "Open all file diagnostics in location list" })
 vim.keymap.set("n", "<leader>dl", vim.diagnostic.open_float,  { desc = "Show diagnostics for current line" })
 
