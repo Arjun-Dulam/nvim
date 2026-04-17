@@ -450,31 +450,16 @@ return {
     },
   },
 
-  -- Telescope: fuzzy finder
+  -- Snacks picker keymaps (replaces Telescope)
   {
-    "nvim-telescope/telescope.nvim",
-    dependencies = { "nvim-lua/plenary.nvim", "nvim-telescope/telescope-fzf-native.nvim" },
-    config = function()
-      local telescope = require("telescope")
-      telescope.setup({
-        defaults = { layout_strategy = "vertical" },
-        extensions = { fzf = { fuzzy = true, override_generic_sorter = true, override_file_sorter = true } },
-      })
-      telescope.load_extension("fzf")
-    end,
+    "folke/snacks.nvim",
     keys = {
-      { "<leader>ff", ":Telescope find_files<CR>", desc = "Find files in project" },
-      { "<leader>fg", ":Telescope live_grep<CR>", desc = "Search text across project" },
-      { "<leader>fb", ":Telescope buffers<CR>", desc = "Find among open buffers" },
-      { "<leader>fh", ":Telescope help_tags<CR>", desc = "Search Neovim help" },
-      { "<leader>fi", ":Telescope current_buffer_fuzzy_find<CR>", desc = "Search text in current buffer" },
+      { "<leader>ff", function() Snacks.picker.files() end,   desc = "Find files in project" },
+      { "<leader>fg", function() Snacks.picker.grep() end,    desc = "Search text across project" },
+      { "<leader>fb", function() Snacks.picker.buffers() end, desc = "Find among open buffers" },
+      { "<leader>fh", function() Snacks.picker.help() end,    desc = "Search Neovim help" },
+      { "<leader>fi", function() Snacks.picker.lines() end,   desc = "Search text in current buffer" },
     },
-  },
-
-  -- telescope-fzf-native: native fzf sorter for telescope
-  {
-    "nvim-telescope/telescope-fzf-native.nvim",
-    build = "cmake -S. -Bbuild -DCMAKE_BUILD_TYPE=Release && cmake --build build --config Release && cmake --install build --prefix build",
   },
 
   -- Gitsigns: git signs and commands
