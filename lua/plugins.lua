@@ -13,14 +13,15 @@ return {
           { "<leader>f", group = "Find and Search" },
           { "<leader>b", group = "Buffer Navigation" },
           { "<leader>s", group = "Window Layouts" },
-          { "<leader>t", group = "Tabs, Terminal, and Typst" },
+          { "<leader>t", group = "Tabs" },
+          { "<leader>T", group = "Terminal" },
           { "<leader>p", group = "Copy File Paths" },
           { "<leader>r", group = "Rename Files and Edit Config" },
           { "<leader>c", group = "Code Actions" },
           { "<leader>l", group = "Language Server Actions" },
           { "<leader>g", group = "Git Change Actions" },
           { "<leader>d", group = "Diagnostics" },
-          { "<leader>m", group = "Markdown Preview" },
+          { "<leader>m", group = "Previews" },
           { "<leader>q", group = "Session Management" },
         },
         win = {
@@ -361,7 +362,7 @@ return {
         desc = "Manage saved sessions",
       },
       {
-        "<leader>tt",
+        "<leader>Tt",
         function()
           Snacks.terminal.toggle(nil, {
             cwd = vim.fn.getcwd(),
@@ -374,7 +375,7 @@ return {
         desc = "Toggle terminal in vertical split",
       },
       {
-        "<leader>tf",
+        "<leader>Tf",
         function()
           Snacks.terminal.toggle(vim.o.shell, { cwd = vim.fn.getcwd() })
         end,
@@ -685,7 +686,6 @@ return {
       require("markview").setup()
     end,
     keys = {
-      { "<leader>mp", ":Markview toggle<CR>",      desc = "Toggle Markdown rendering" },
       { "<leader>ms", ":Markview splitToggle<CR>", desc = "Toggle Markdown split preview" },
     },
   },

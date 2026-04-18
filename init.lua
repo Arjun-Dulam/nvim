@@ -290,7 +290,16 @@ end, { desc = "Clear custom tab name" })
 -- re-sourced, the old autocmds are wiped first so they don't pile up and fire multiple times.
 local augroup = vim.api.nvim_create_augroup("UserConfig", { clear = true })
 
-vim.keymap.set("n", "<leader>tp", ":TypstPreviewToggle<CR>", { desc = "Typst live preview" })
+vim.keymap.set("n", "<leader>mp", function()
+  local ft = vim.bo.filetype
+  if ft == "markdown" then
+    vim.cmd("Markview toggle")
+  elseif ft == "typst" then
+    vim.cmd("TypstPreviewToggle")
+  else
+    vim.notify("No preview available for filetype: " .. ft, vim.log.levels.WARN)
+  end
+end, { desc = "Preview current file" })
 
 vim.api.nvim_create_autocmd("FileType", {
   group = augroup,
