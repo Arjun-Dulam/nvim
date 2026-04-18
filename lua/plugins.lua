@@ -457,8 +457,7 @@ return {
     keys = {
       { "<leader>ff", function() Snacks.picker.files() end,   desc = "Find files in project" },
       { "<leader>fg", function() Snacks.picker.grep() end,    desc = "Search text across project" },
-      { "<leader>fb", function() Snacks.picker.buffers() end, desc = "Find among open buffers" },
-      { "<leader>fh", function() Snacks.picker.help() end,    desc = "Search Neovim help" },
+      { "<leader>fb", function() Snacks.picker.buffers() end, desc = "Find text in open buffers" },
       { "<leader>fi", function() Snacks.picker.lines() end,   desc = "Search text in current buffer" },
     },
   },
@@ -521,9 +520,6 @@ return {
         require("conform").format({ async = true })
       end, {})
     end,
-    keys = {
-      { "<leader>fa", "<cmd>Format<CR>", desc = "Format current buffer with Conform" },
-    },
   },
 
   -- lualine: statusline plugin

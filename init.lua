@@ -399,9 +399,6 @@ local function setup_lsp()
       vim.keymap.set("n", "<leader>la", vim.lsp.buf.code_action, vim.tbl_extend("force", opts, { desc = "Show available code actions" }))
       vim.keymap.set("n", "<leader>ca", vim.lsp.buf.code_action, vim.tbl_extend("force", opts, { desc = "Show available code actions" }))
       vim.keymap.set("n", "gr", vim.lsp.buf.references,      vim.tbl_extend("force", opts, { desc = "Show all references" }))
-      vim.keymap.set("n", "<leader>lf", function()
-        vim.lsp.buf.format { async = true }
-      end, vim.tbl_extend("force", opts, { desc = "Format current buffer with LSP" }))
     end,
   })
 
