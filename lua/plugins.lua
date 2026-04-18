@@ -8,7 +8,6 @@ return {
         preset = "modern",
         sort = { "manual" },
         spec = {
-          { "g", group = "Go to / LSP" },
           { "<leader>e", desc = "Toggle file explorer sidebar" },
           { "<leader>f", group = "Find and Search" },
           { "<leader>b", group = "Buffer Navigation" },

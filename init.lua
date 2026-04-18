@@ -382,34 +382,16 @@ local function setup_lsp()
     float = { border = "rounded", source = "always", header = "", prefix = "" },
   })
 
-  -- LspAttach: these keybindings are only set when a language server connects to the current buffer.
-  -- They won't exist in buffers with no LSP (e.g. plain text files).
-  --   gd: jump to where a function/variable is defined
-  --   gD: jump to where it's declared (different from definition in some languages like C)
-  --   K: show hover documentation popup for whatever's under the cursor
-  --   gi: go to implementation (e.g. the concrete class that implements an interface)
-  --   <leader>ld: go to the type definition of a variable
-  --   <leader>lr: rename symbol everywhere it's used across the codebase
-  --   <leader>la: show code actions (quick fixes, import suggestions, etc.)
-  --   gr: show all references to the symbol under the cursor
-  --   <leader>lf: format the entire file using the language server's formatter
-  vim.api.nvim_create_autocmd("LspAttach", {
-    group = augroup,
-    callback = function(ev)
-      local opts = { buffer = ev.buf }
-      vim.keymap.set("n", "gD", vim.lsp.buf.declaration,     vim.tbl_extend("force", opts, { desc = "Go to declaration" }))
-      vim.keymap.set("n", "gd", vim.lsp.buf.definition,      vim.tbl_extend("force", opts, { desc = "Go to definition" }))
-      vim.keymap.set("n", "K",  vim.lsp.buf.hover,           opts)
-      vim.keymap.set("n", "gi", vim.lsp.buf.implementation,  vim.tbl_extend("force", opts, { desc = "Go to implementation" }))
-      vim.keymap.set("n", "<leader>ld", vim.lsp.buf.type_definition, vim.tbl_extend("force", opts, { desc = "Go to symbol type definition" }))
-      vim.keymap.set("n", "<leader>D", vim.lsp.buf.type_definition, vim.tbl_extend("force", opts, { desc = "Go to symbol type definition" }))
-      vim.keymap.set("n", "<leader>lr", vim.lsp.buf.rename, vim.tbl_extend("force", opts, { desc = "Rename symbol across project" }))
-      vim.keymap.set("n", "<leader>rn", vim.lsp.buf.rename, vim.tbl_extend("force", opts, { desc = "Rename symbol across project" }))
-      vim.keymap.set("n", "<leader>la", vim.lsp.buf.code_action, vim.tbl_extend("force", opts, { desc = "Show available code actions" }))
-      vim.keymap.set("n", "<leader>ca", vim.lsp.buf.code_action, vim.tbl_extend("force", opts, { desc = "Show available code actions" }))
-      vim.keymap.set("n", "gr", vim.lsp.buf.references,      vim.tbl_extend("force", opts, { desc = "Show all references" }))
-    end,
-  })
+  -- LSP keybindings — global so they always appear in which-key.
+  -- The LSP functions handle "no server attached" gracefully on their own.
+  vim.keymap.set("n", "K",          vim.lsp.buf.hover,           {})
+  vim.keymap.set("n", "<leader>ld", vim.lsp.buf.definition,      { desc = "Go to definition" })
+  vim.keymap.set("n", "<leader>lD", vim.lsp.buf.declaration,     { desc = "Go to declaration" })
+  vim.keymap.set("n", "<leader>li", vim.lsp.buf.implementation,  { desc = "Go to implementation" })
+  vim.keymap.set("n", "<leader>lt", vim.lsp.buf.type_definition, { desc = "Go to type definition" })
+  vim.keymap.set("n", "<leader>lR", vim.lsp.buf.references,      { desc = "Show all references" })
+  vim.keymap.set("n", "<leader>lr", vim.lsp.buf.rename,          { desc = "Rename symbol across project" })
+  vim.keymap.set("n", "<leader>ca", vim.lsp.buf.code_action,     { desc = "Show available code actions" })
 
   -- Patches all LSP floating windows (hover docs, signature help) to use rounded borders
   local orig = vim.lsp.util.open_floating_preview
