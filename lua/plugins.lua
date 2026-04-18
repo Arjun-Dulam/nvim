@@ -477,11 +477,6 @@ return {
         },
       })
     end,
-    keys = {
-      { "<leader>gb", ":Gitsigns blame_line<CR>", desc = "Show blame for current line" },
-      { "<leader>gd", ":Gitsigns diffthis<CR>", desc = "Diff current buffer" },
-      { "<leader>gh", ":Gitsigns preview_hunk<CR>", desc = "Preview current git hunk" },
-    },
   },
 
   -- conform.nvim: code formatter with clang-format for C++
