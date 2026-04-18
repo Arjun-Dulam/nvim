@@ -430,9 +430,8 @@ return {
     ft = "typst",
     version = "1.*",
     opts = {
-      dependencies_bin = {
-        tinymist = "tinymist",
-      },
+      dependencies_bin = { tinymist = "tinymist" },
+      open_cmd = "/Users/adulam/scripts/typst-webview %s",
     },
   },
 
@@ -654,6 +653,10 @@ return {
   {
     "nvim-treesitter/nvim-treesitter",
     build = ":TSUpdate",
+    opts = {
+      ensure_installed = { "typst" },
+      highlight = { enable = true },
+    },
   },
 
   -- nvim-treesitter-textobjects: af/if/ac/ic textobjects for functions and classes
