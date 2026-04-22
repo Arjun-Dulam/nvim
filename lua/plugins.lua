@@ -361,7 +361,7 @@ return {
         desc = "Manage saved sessions",
       },
       {
-        "<leader>Tt",
+        "<leader>Tv",
         function()
           Snacks.terminal.toggle(nil, {
             cwd = vim.fn.getcwd(),
@@ -374,7 +374,7 @@ return {
         desc = "Toggle terminal in vertical split",
       },
       {
-        "<leader>Tf",
+        "<leader>Tt",
         function()
           Snacks.terminal.toggle(vim.o.shell, { cwd = vim.fn.getcwd() })
         end,
@@ -432,6 +432,7 @@ return {
     opts = {
       dependencies_bin = { tinymist = "tinymist" },
       open_cmd = "/Users/adulam/scripts/typst-webview %s",
+      auto_start = false,
     },
   },
 
@@ -489,6 +490,7 @@ return {
           c = { "clang-format" },
           proto = { "buf" },
           cmake = { "cmake_format" },
+          typst = { lsp_format = "prefer" },
         },
         formatters = {
           ["clang-format"] = {
