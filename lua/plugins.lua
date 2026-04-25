@@ -397,7 +397,7 @@ return {
     dependencies = { "mason.nvim" },
     config = function()
       require("mason-lspconfig").setup({
-        ensure_installed = { "clangd", "protols", "tinymist" },
+        ensure_installed = { "clangd", "protols" },
       })
     end,
   },
@@ -410,30 +410,9 @@ return {
       local capabilities = require("cmp_nvim_lsp").default_capabilities()
       vim.lsp.config("clangd", { capabilities = capabilities })
       vim.lsp.config("protols", { capabilities = capabilities })
-      vim.lsp.config("tinymist", {
-        capabilities = capabilities,
-        settings = {
-          formatterMode = "typstyle",
-          exportPdf = "onType",
-          semanticTokens = "disable",
-        },
-      })
       vim.lsp.enable("clangd")
       vim.lsp.enable("protols")
-      vim.lsp.enable("tinymist")
     end,
-  },
-
-  -- Typst live preview via tinymist
-  {
-    "chomosuke/typst-preview.nvim",
-    ft = "typst",
-    version = "1.*",
-    opts = {
-      dependencies_bin = { tinymist = "tinymist" },
-      open_cmd = "/Users/adulam/scripts/typst-webview %s",
-      auto_start = false,
-    },
   },
 
   -- nvim-tree: file explorer sidebar
@@ -490,7 +469,6 @@ return {
           c = { "clang-format" },
           proto = { "buf" },
           cmake = { "cmake_format" },
-          typst = { lsp_format = "prefer" },
         },
         formatters = {
           ["clang-format"] = {
@@ -637,17 +615,6 @@ return {
   -- nvim-lint: disabled — clangd LSP already provides real-time diagnostics
   -- { "mfussenegger/nvim-lint" },
 
-
-  -- vimtex: LaTeX compilation, Zathura integration, and SyncTeX
-  {
-    "lervag/vimtex",
-    ft = "tex",
-    init = function()
-      vim.g.vimtex_view_method = "skim"
-      vim.g.vimtex_compiler_method = "latexmk"
-    end,
-  },
-
   -- protobuf.vim: syntax highlighting and indent for protobuf/gRPC
   { "wfxr/protobuf.vim", ft = "proto" },
 
@@ -656,7 +623,7 @@ return {
     "nvim-treesitter/nvim-treesitter",
     build = ":TSUpdate",
     opts = {
-      ensure_installed = { "typst" },
+      ensure_installed = {},
       highlight = { enable = true },
     },
   },

@@ -291,15 +291,8 @@ end, { desc = "Clear custom tab name" })
 local augroup = vim.api.nvim_create_augroup("UserConfig", { clear = true })
 
 vim.keymap.set("n", "<leader>mp", function()
-  local ft = vim.bo.filetype
-  if ft == "markdown" then
-    vim.cmd("Markview toggle")
-  elseif ft == "typst" then
-    vim.cmd("TypstPreviewToggle")
-  else
-    vim.notify("No preview available for filetype: " .. ft, vim.log.levels.WARN)
-  end
-end, { desc = "Preview current file" })
+  vim.cmd("Markview toggle")
+end, { desc = "Toggle Markdown preview" })
 
 vim.api.nvim_create_autocmd("FileType", {
   group = augroup,
