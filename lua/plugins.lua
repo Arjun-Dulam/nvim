@@ -20,7 +20,7 @@ return {
           { "<leader>l", group = "Language Server Actions" },
           { "<leader>g", group = "Git Change Actions" },
           { "<leader>d", group = "Diagnostics" },
-          { "<leader>m", group = "Previews" },
+          { "<leader>m", group = "Markdown and Typst Previews" },
           { "<leader>q", group = "Session Management" },
         },
         win = {
@@ -397,7 +397,7 @@ return {
     dependencies = { "mason.nvim" },
     config = function()
       require("mason-lspconfig").setup({
-        ensure_installed = { "clangd", "protols" },
+        ensure_installed = { "clangd", "protols", "tinymist" },
       })
     end,
   },
@@ -410,8 +410,13 @@ return {
       local capabilities = require("cmp_nvim_lsp").default_capabilities()
       vim.lsp.config("clangd", { capabilities = capabilities })
       vim.lsp.config("protols", { capabilities = capabilities })
+      vim.lsp.config("tinymist", {
+        capabilities = capabilities,
+        settings = { exportPdf = "onSave" },
+      })
       vim.lsp.enable("clangd")
       vim.lsp.enable("protols")
+      vim.lsp.enable("tinymist")
     end,
   },
 
@@ -469,6 +474,7 @@ return {
           c = { "clang-format" },
           proto = { "buf" },
           cmake = { "cmake_format" },
+          typst = { "tinymist" },
         },
         formatters = {
           ["clang-format"] = {
@@ -623,7 +629,7 @@ return {
     "nvim-treesitter/nvim-treesitter",
     build = ":TSUpdate",
     opts = {
-      ensure_installed = {},
+      ensure_installed = { "typst" },
       highlight = { enable = true },
     },
   },
@@ -647,6 +653,22 @@ return {
         end)
       end
     end,
+  },
+
+  -- typst-preview.nvim: browser-based live preview for Typst files
+  {
+    "chomosuke/typst-preview.nvim",
+    ft = "typst",
+    version = "^1.0.0",
+    build = function()
+      require("typst-preview").update()
+    end,
+    config = function()
+      require("typst-preview").setup({ open_cmd = "open %s" })
+    end,
+    keys = {
+      { "<leader>mt", ":TypstPreviewToggle<CR>", ft = "typst", desc = "Toggle Typst browser preview" },
+    },
   },
 
   -- markview.nvim: in-buffer markdown renderer with splitview support
